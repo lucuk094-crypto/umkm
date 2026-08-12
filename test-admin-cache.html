@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Admin Cache - UMKM Desa Mlancu</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 40px;
+      max-width: 1000px;
+      margin: 0 auto;
+      background: #0a0a0a;
+      color: #e0e0e0;
+    }
+    h1 {
+      color: #d4a373;
+      border-bottom: 2px solid #d4a373;
+      padding-bottom: 16px;
+    }
+    .status-box {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 20px 0;
+    }
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 8px;
+      background: #0f0f0f;
+    }
+    .status-icon {
+      font-size: 24px;
+      min-width: 30px;
+    }
+    .status-label {
+      font-weight: 600;
+      min-width: 250px;
+    }
+    .status-value {
+      color: #888;
+      font-family: monospace;
+      font-size: 0.9em;
+    }
+    .success { color: #4ade80; }
+    .error { color: #f87171; }
+    .warning { color: #fbbf24; }
+    .btn {
+      background: #d4a373;
+      color: #0a0a0a;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 8px 8px 8px 0;
+    }
+    .btn:hover {
+      background: #c09060;
+    }
+    pre {
+      background: #0f0f0f;
+      padding: 16px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 0.85em;
+      border: 1px solid #333;
+    }
+    .alert {
+      padding: 16px;
+      border-radius: 8px;
+      margin: 20px 0;
+      border-left: 4px solid;
+    }
+    .alert-error {
+      background: rgba(248, 113, 113, 0.1);
+      border-color: #f87171;
+      color: #fca5a5;
+    }
+    .alert-success {
+      background: rgba(74, 222, 128, 0.1);
+      border-color: #4ade80;
+      color: #86efac;
+    }
+    .alert-warning {
+      background: rgba(251, 191, 36, 0.1);
+      border-color: #fbbf24;
+      color: #fcd34d;
+    }
+    .code-block {
+      margin: 16px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔍 Test Admin Dashboard Cache</h1>
+  <p style="color: #888; margin-bottom: 32px;">
+    Diagnostic tool untuk memverifikasi versi admin-script.js yang di-load browser
+  </p>
+
+  <div class="status-box">
+    <h2 style="margin-top: 0;">File Version Check</h2>
+    <div id="versionCheck">Checking...</div>
+  </div>
+
+  <div class="status-box">
+    <h2 style="margin-top: 0;">Supabase Status</h2>
+    <div id="supabaseStatus">Checking...</div>
+  </div>
+
+  <div class="status-box">
+    <h2 style="margin-top: 0;">Actions</h2>
+    <button class="btn" onclick="clearCacheAndReload()">🔄 Clear Cache & Reload Dashboard</button>
+    <button class="btn" onclick="testSetImageFromUrl()">🧪 Test setImageFromUrl Function</button>
+    <button class="btn" onclick="viewFullCode()">📄 View First 100 Lines of admin-script.js</button>
+  </div>
+
+  <div id="codePreview" class="code-block"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script>
+    async function checkFileVersion() {
+      const container = document.getElementById('versionCheck');
+      try {
+        // Fetch with cache-busting
+        const response = await fetch('/admin-script.js?' + Date.now());
+        const code = await response.text();
+        
+        const checks = {
+          hasWaitForSupabase: code.includes('function waitForSupabase()'),
+          usesSUPABASE_READY: code.includes('window.SUPABASE_READY'),
+          hasGetSupabase: code.includes('function getSupabase()'),
+          hasSetImageFromUrl: code.includes('window.setImageFromUrl'),
+          hasProperCheckAuth: code.includes('const { data: { session }, error }'),
+          checkAuthLine: findLineNumber(code, 'async function checkAuth()'),
+          totalLines: code.split('\\n').length
+        };
+        
+        let html = '';
+        let allPassed = true;
+        
+        // Check each feature
+        const features = [
+          { key: 'hasWaitForSupabase', label: 'waitForSupabase function', required: true },
+          { key: 'usesSUPABASE_READY', label: 'Uses SUPABASE_READY flag', required: true },
+          { key: 'hasGetSupabase', label: 'getSupabase helper function', required: true },
+          { key: 'hasSetImageFromUrl', label: 'setImageFromUrl exposed to window', required: true },
+          { key: 'hasProperCheckAuth', label: 'Fixed checkAuth with try-catch', required: true }
+        ];
+        
+        features.forEach(f => {
+          const passed = checks[f.key];
+          if (f.required && !passed) allPassed = false;
+          html += `
+            <div class="status-item">
+              <span class="status-icon">${passed ? '✅' : '❌'}</span>
+              <span class="status-label">${f.label}</span>
+              <span class="status-value ${passed ? 'success' : 'error'}">${passed ? 'Found' : 'MISSING'}</span>
+            </div>
+          `;
+        });
+        
+        html += `
+          <div class="status-item">
+            <span class="status-icon">📄</span>
+            <span class="status-label">checkAuth() starts at line</span>
+            <span class="status-value">${checks.checkAuthLine}</span>
+          </div>
+          <div class="status-item">
+            <span class="status-icon">📊</span>
+            <span class="status-label">Total lines in file</span>
+            <span class="status-value">${checks.totalLines} lines</span>
+          </div>
+        `;
+        
+        if (allPassed) {
+          html += `
+            <div class="alert alert-success">
+              <strong>✅ SUCCESS!</strong><br>
+              File version is correct. All fixes are present in the deployed code.
+              <br><br>
+              <strong>Next Step:</strong> Clear browser cache with Ctrl+Shift+R or use the button above.
+            </div>
+          `;
+        } else {
+          html += `
+            <div class="alert alert-error">
+              <strong>❌ OLD VERSION DETECTED!</strong><br>
+              Browser is loading an old cached version OR Vercel hasn't deployed yet.
+              <br><br>
+              <strong>Solutions:</strong>
+              <ol style="margin: 12px 0; padding-left: 20px;">
+                <li>Wait 2-3 minutes for Vercel deployment to finish</li>
+                <li>Check <a href="https://vercel.com" style="color: #d4a373;">Vercel dashboard</a> deployment status</li>
+                <li>Hard refresh: Ctrl + Shift + R</li>
+                <li>Try Incognito mode: Ctrl + Shift + N</li>
+              </ol>
+            </div>
+          `;
+        }
+        
+        container.innerHTML = html;
+        
+      } catch (error) {
+        container.innerHTML = `
+          <div class="alert alert-error">
+            <strong>❌ Error checking file:</strong><br>
+            ${error.message}
+          </div>
+        `;
+      }
+    }
+    
+    async function checkSupabase() {
+      const container = document.getElementById('supabaseStatus');
+      
+      // Wait a bit for config.js to initialize
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const checks = {
+        hasConfig: typeof window.SUPABASE_CONFIG !== 'undefined',
+        hasSupabaseReady: typeof window.SUPABASE_READY !== 'undefined',
+        supabaseReadyValue: window.SUPABASE_READY,
+        hasSupabaseClient: typeof window.supabase !== 'undefined',
+        hasFromMethod: typeof window.supabase?.from === 'function',
+        hasAuthMethod: typeof window.supabase?.auth !== 'undefined'
+      };
+      
+      let html = '';
+      
+      Object.entries(checks).forEach(([key, value]) => {
+        const passed = value === true || (key === 'supabaseReadyValue' && value === true);
+        const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+        html += `
+          <div class="status-item">
+            <span class="status-icon">${passed ? '✅' : '⚠️'}</span>
+            <span class="status-label">${label}</span>
+            <span class="status-value ${passed ? 'success' : 'warning'}">${String(value)}</span>
+          </div>
+        `;
+      });
+      
+      if (checks.supabaseReadyValue) {
+        html += `
+          <div class="alert alert-success">
+            <strong>✅ Supabase Ready!</strong><br>
+            Client is initialized and ready to use.
+          </div>
+        `;
+      } else {
+        html += `
+          <div class="alert alert-warning">
+            <strong>⚠️ Supabase Not Ready</strong><br>
+            Still initializing... This is normal if you just loaded the page.
+          </div>
+        `;
+      }
+      
+      container.innerHTML = html;
+    }
+    
+    function findLineNumber(code, searchStr) {
+      const lines = code.split('\\n');
+      for (let i = 0; i < lines.length; i++) {
+        if (lines[i].includes(searchStr)) {
+          return i + 1;
+        }
+      }
+      return 'Not found';
+    }
+    
+    function clearCacheAndReload() {
+      if (confirm('This will open Dashboard Admin in a new window with cache disabled. Continue?')) {
+        // Open dashboard with cache-busting parameter
+        window.open('/admin-dashboard.html?' + Date.now(), '_blank');
+        
+        // Show instructions
+        alert('Dashboard opened in new window.\\n\\n' +
+              'In the new window:\\n' +
+              '1. Press F12 to open Console\\n' +
+              '2. Press Ctrl+Shift+R to hard refresh\\n' +
+              '3. Check for "SUPABASE_READY: true" in console\\n' +
+              '4. Try clicking dashboard menu items');
+      }
+    }
+    
+    function testSetImageFromUrl() {
+      const exists = typeof window.setImageFromUrl === 'function';
+      
+      if (exists) {
+        alert('✅ setImageFromUrl function EXISTS on window object!\\n\\n' +
+              'This means the function should work in the dashboard.');
+      } else {
+        alert('❌ setImageFromUrl function NOT FOUND on window object.\\n\\n' +
+              'This indicates browser is loading old cached code.');
+      }
+    }
+    
+    async function viewFullCode() {
+      const container = document.getElementById('codePreview');
+      try {
+        const response = await fetch('/admin-script.js?' + Date.now());
+        const code = await response.text();
+        const first100Lines = code.split('\\n').slice(0, 100).join('\\n');
+        
+        container.innerHTML = `
+          <h3>First 100 Lines of admin-script.js</h3>
+          <pre>${escapeHtml(first100Lines)}</pre>
+        `;
+      } catch (error) {
+        container.innerHTML = `
+          <div class="alert alert-error">
+            Error loading code: ${error.message}
+          </div>
+        `;
+      }
+    }
+    
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    // Run checks on load
+    checkFileVersion();
+    checkSupabase();
+  </script>
+</body>
+</html>
