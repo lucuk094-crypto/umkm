@@ -293,29 +293,81 @@
       }
       
       try {
+        // Wait for Supabase to be ready
+        console.log('⏳ Waiting for Supabase...');
+        await waitForSupabase();
+        console.log('✅ Supabase ready, fetching producer...');
+        
         // Fetch producer by slug
-        const { data, error } = await supabase
+        const { data, error } = await window.supabase
           .from('producers')
           .select('*')
           .eq('slug', slug)
           .single();
         
-        if (error) throw error;
+        if (error) {
+          console.error('❌ Error fetching producer:', error);
+          throw error;
+        }
+        
         if (!data) {
+          console.error('❌ Producer not found for slug:', slug);
           alert('Pengrajin tidak ditemukan');
           window.location.href = 'index.html#producers';
           return;
         }
         
+        console.log('✅ Producer loaded:', data);
         producer = data;
         renderProducerDetail(producer);
         loadProducerProducts(producer.id);
         
       } catch (error) {
-        console.error('Error loading producer:', error);
-        alert('Gagal memuat data pengrajin');
+        console.error('❌ Error loading producer:', error);
+        alert('Gagal memuat data pengrajin: ' + error.message);
         window.location.href = 'index.html#producers';
       }
+    }
+    
+    // Wait for Supabase (same as in script.js)
+    function waitForSupabase() {
+      return new Promise((resolve) => {
+        console.log('⏳ waitForSupabase() called');
+        
+        let attempts = 0;
+        const maxAttempts = 100; // 10 seconds max
+        
+        const checkSupabase = () => {
+          attempts++;
+          
+          // Check the SUPABASE_READY flag set by config.js
+          if (window.SUPABASE_READY === true) {
+            console.log('✅ Supabase ready (SUPABASE_READY flag = true)');
+            resolve(true);
+            return;
+          }
+          
+          // Also check directly
+          if (window.supabase && typeof window.supabase.from === 'function') {
+            console.log('✅ Supabase ready (direct check)');
+            window.SUPABASE_READY = true;
+            resolve(true);
+            return;
+          }
+          
+          // Timeout
+          if (attempts >= maxAttempts) {
+            console.error('⚠️ Supabase timeout after 10 seconds');
+            resolve(false);
+            return;
+          }
+          
+          // Keep trying
+          setTimeout(checkSupabase, 100);
+        };
+        
+        checkSupabase();
+      });
     }
     
     // Render producer detail
@@ -387,14 +439,21 @@
     // Load products from this producer
     async function loadProducerProducts(producerId) {
       try {
-        const { data, error } = await supabase
+        console.log('📦 Loading products for producer:', producerId);
+        
+        const { data, error } = await window.supabase
           .from('products')
           .select('*')
           .eq('producer_id', producerId)
           .eq('is_active', true)
           .order('created_at', { ascending: false });
         
-        if (error) throw error;
+        if (error) {
+          console.error('❌ Error loading products:', error);
+          throw error;
+        }
+        
+        console.log('✅ Products loaded:', data?.length || 0);
         
         const grid = document.getElementById('producerProductsGrid');
         
@@ -428,7 +487,7 @@
         `).join('');
         
       } catch (error) {
-        console.error('Error loading products:', error);
+        console.error('❌ Error loading products:', error);
       }
     }
     
@@ -443,10 +502,10 @@
     
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', async () => {
-      if (typeof supabase === 'undefined' || !supabase) {
-        alert('Website belum dikonfigurasi. Silakan setup Supabase terlebih dahulu.');
-        window.location.href = 'index.html';
-        return;
+      console.log('🚀 Producer detail page initializing...');
+      
+      if (typeof window.supabase === 'undefined' || !window.supabase) {
+        console.warn('⚠️ Supabase not ready yet, waiting...');
       }
       
       await loadProducerDetail();
