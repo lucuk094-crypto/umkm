@@ -378,7 +378,7 @@ function renderTestimonials() {
 
   tStage.innerHTML = TESTIMONIALS.map((t, index) => `
     <div class="t-card ${index === 0 ? 'active' : ''}">
-      <p class="t-quote">"${t.quote}"</p>
+      <p class="t-quote">"${t.message || t.quote}"</p>
       <div class="t-author">— ${t.customer_name}${t.customer_role ? ', ' + t.customer_role : ''}</div>
     </div>
   `).join('');
