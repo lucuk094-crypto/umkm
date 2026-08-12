@@ -1000,6 +1000,70 @@ window.updateOrderStatus = async (orderId, status) => {
   }
 };
 
+
+// ===== SITE ASSETS MANAGEMENT =====
+async function loadSiteAssets() {
+  console.log('📦 Loading site assets...');
+  const supabase = getSupabase();
+  
+  try {
+    const { data: settings, error } = await supabase
+      .from('settings')
+      .select('*')
+      .in('key', ['hero_banner_url', 'about_image_url', 'site_logo_url']);
+    
+    if (error) throw error;
+    console.log('✅ Site assets loaded:', settings);
+    
+    const settingsMap = {};
+    if (settings) {
+      settings.forEach(s => { settingsMap[s.key] = s.value; });
+    }
+    
+    const heroBannerUrl = settingsMap['hero_banner_url'] || 'https://i.ibb.co/84zR6qfT/hero-img.png';
+    const heroBannerPreview = document.getElementById('heroBannerPreview');
+    const heroBannerUrlDisplay = document.getElementById('heroBannerUrl');
+    
+    if (heroBannerPreview) {
+      heroBannerPreview.innerHTML = `<img src="" alt="Hero Banner" style="width: 100%; height: 100%; object-fit: cover;">`;
+    }
+    if (heroBannerUrlDisplay) {
+      heroBannerUrlDisplay.textContent = heroBannerUrl;
+    }
+    
+    const aboutImageUrl = settingsMap['about_image_url'] || 'https://i.ibb.co/7Tpv4J9/about-coffee-bag.jpg';
+    const aboutImagePreview = document.getElementById('aboutImagePreview');
+    const aboutImageUrlDisplay = document.getElementById('aboutImageUrl');
+    
+    if (aboutImagePreview) {
+      aboutImagePreview.innerHTML = `<img src="" alt="About Image" style="width: 100%; height: 100%; object-fit: cover;">`;
+    }
+    if (aboutImageUrlDisplay) {
+      aboutImageUrlDisplay.textContent = aboutImageUrl;
+    }
+    
+    const logoUrl = settingsMap['site_logo_url'];
+    const logoPreview = document.getElementById('logoPreview');
+    const logoUrlDisplay = document.getElementById('logoUrl');
+    
+    if (logoPreview) {
+      if (logoUrl) {
+        logoPreview.innerHTML = `<img src="" alt="Logo" style="width: 100%; height: 100%; object-fit: contain; padding: 20px;">`;
+      } else {
+        logoPreview.innerHTML = `<div style="display: grid; place-items: center; height: 100%; color: var(--muted);"><p>Belum ada logo</p></div>`;
+      }
+    }
+    if (logoUrlDisplay) {
+      logoUrlDisplay.textContent = logoUrl || '-';
+    }
+    
+    console.log('✅ Site assets UI updated');
+    
+  } catch (error) {
+    console.error('❌ Error in loadSiteAssets:', error);
+    showToast('Gagal memuat site assets', 'error');
+  }
+}
 // ===== SETTINGS MANAGEMENT =====
 async function loadSettings() {
   const supabase = getSupabase();
