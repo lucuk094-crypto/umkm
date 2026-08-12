@@ -1,1 +1,22 @@
 .vercel
+
+# Environment variables (JANGAN PUSH!)
+.env
+.env.local
+.env.production
+config.js
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Backup files
+*-backup.js
+*-original-backup.js
