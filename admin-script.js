@@ -13,14 +13,11 @@ window.addEventListener('DOMContentLoaded', () => {
 
 async function initializeDashboard() {
   const supabase = getSupabase();
-  const supabase = getSupabase();
   await checkAuth();
 }
 
 // Check authentication
 async function checkAuth() {
-  const supabase = getSupabase();
-  const supabase = getSupabase();
   const supabase = getSupabase();
   
   if (!supabase) {
@@ -90,8 +87,6 @@ function showToast(message, type = 'success') {
 
 // Load Dashboard Data
 async function loadDashboard() {
-  const supabase = getSupabase();
-  const supabase = getSupabase();
   const supabase = getSupabase();
   try {
     // Get counts
@@ -167,7 +162,6 @@ async function loadPageData(page) {
 
 // ===== PRODUCTS MANAGEMENT =====
 async function loadProducts() {
-  const supabase = getSupabase();
   const supabase = getSupabase();
   try {
     const { data: products, error } = await supabase
@@ -311,7 +305,6 @@ async function showProductModal(productId = null) {
 
 async function saveProduct(productId, formData) {
   const supabase = getSupabase();
-  const supabase = getSupabase();
   try {
     const data = {
       name: formData.get('name'),
@@ -370,7 +363,6 @@ window.deleteProduct = deleteProduct;
 
 // ===== PRODUCERS MANAGEMENT =====
 async function loadProducers() {
-  const supabase = getSupabase();
   const supabase = getSupabase();
   try {
     const { data: producers, error } = await supabase
@@ -647,7 +639,6 @@ window.deleteProducer = deleteProducer;
 // ===== GALLERY MANAGEMENT =====
 async function loadGallery() {
   const supabase = getSupabase();
-  const supabase = getSupabase();
   try {
     const { data: gallery, error } = await supabase
       .from('gallery')
@@ -802,7 +793,6 @@ async function saveGallery(galleryId, formData) {
 
 // ===== TESTIMONIALS MANAGEMENT =====
 async function loadTestimonials() {
-  const supabase = getSupabase();
   const supabase = getSupabase();
   try {
     const { data: testimonials, error } = await supabase
@@ -960,7 +950,6 @@ window.deleteTestimonial = deleteTestimonial;
 // ===== ORDERS MANAGEMENT =====
 async function loadOrders() {
   const supabase = getSupabase();
-  const supabase = getSupabase();
   try {
     const { data: orders, error } = await supabase
       .from('orders')
@@ -1013,7 +1002,6 @@ window.updateOrderStatus = async (orderId, status) => {
 
 // ===== SETTINGS MANAGEMENT =====
 async function loadSettings() {
-  const supabase = getSupabase();
   const supabase = getSupabase();
   try {
     const { data: settings, error } = await supabase.from('settings').select('*');
