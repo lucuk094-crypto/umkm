@@ -1,54 +1,48 @@
-// Supabase Helper - Initialize Supabase client
+// Supabase Helper - Simple and reliable initialization
 (function() {
-  let retryCount = 0;
-  const maxRetries = 50; // 5 seconds total (50 * 100ms)
+  console.log('🔄 Loading Supabase helper...');
   
-  // Wait for Supabase CDN to load
   function initSupabase() {
-    // Check if Supabase CDN loaded
-    if (window.supabase && typeof window.supabase.createClient === 'function') {
-      // Check if config exists
-      if (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url && window.SUPABASE_CONFIG.anonKey) {
-        try {
-          // Create client if not exists
-          if (!window.supabaseClient) {
-            const supabaseLib = window.supabase; // Save reference to library
-            
-            window.supabaseClient = supabaseLib.createClient(
-              window.SUPABASE_CONFIG.url,
-              window.SUPABASE_CONFIG.anonKey
-            );
-            
-            // Use supabaseClient as the main client
-            window.supabase = window.supabaseClient;
-            
-            console.log('✅ Supabase initialized successfully');
-            console.log('📊 Project URL:', window.SUPABASE_CONFIG.url);
-            console.log('🔑 Anon Key:', window.SUPABASE_CONFIG.anonKey.substring(0, 20) + '...');
-          }
-        } catch (error) {
-          console.error('❌ Error creating Supabase client:', error);
-        }
-      } else {
-        console.error('❌ SUPABASE_CONFIG not found or incomplete');
-        console.log('💡 Make sure config.js is loaded before supabase-helper.js');
-      }
-    } else {
-      // Retry if not loaded yet
-      retryCount++;
-      if (retryCount < maxRetries) {
-        setTimeout(initSupabase, 100);
-      } else {
-        console.error('❌ Supabase CDN failed to load after 5 seconds');
-        console.log('💡 Check your internet connection or try refreshing the page');
-      }
+    // Check if Supabase CDN and config are loaded
+    if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+      console.error('❌ Supabase library not loaded');
+      return false;
+    }
+    
+    if (!window.SUPABASE_CONFIG || !window.SUPABASE_CONFIG.url || !window.SUPABASE_CONFIG.anonKey) {
+      console.error('❌ SUPABASE_CONFIG not found');
+      return false;
+    }
+    
+    try {
+      // Store reference to createClient before overwriting
+      const { createClient } = window.supabase;
+      
+      // Create the client
+      const client = createClient(
+        window.SUPABASE_CONFIG.url,
+        window.SUPABASE_CONFIG.anonKey
+      );
+      
+      // Set both references
+      window.supabaseClient = client;
+      window.supabase = client;
+      
+      console.log('✅ Supabase initialized successfully');
+      console.log('📊 Project:', window.SUPABASE_CONFIG.url);
+      return true;
+    } catch (error) {
+      console.error('❌ Error initializing Supabase:', error);
+      return false;
     }
   }
   
-  // Start initialization
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initSupabase);
+  // Try to initialize immediately if DOM is ready
+  if (document.readyState !== 'loading') {
+    setTimeout(initSupabase, 100);
   } else {
-    initSupabase();
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(initSupabase, 100);
+    });
   }
 })();

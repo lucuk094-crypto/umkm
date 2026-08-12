@@ -9,12 +9,13 @@ function waitForSupabase() {
     const checkSupabase = () => {
       attempts++;
       
-      if (window.supabase || window.supabaseClient) {
+      // Check if supabase client has the methods we need
+      if (window.supabase && typeof window.supabase.from === 'function') {
         console.log('✅ Supabase ready for website');
-        resolve();
+        resolve(true);
       } else if (attempts >= maxAttempts) {
         console.warn('⚠️ Supabase timeout after 5 seconds');
-        resolve(); // Resolve anyway to prevent blocking
+        resolve(false);
       } else {
         setTimeout(checkSupabase, 100);
       }
@@ -505,27 +506,29 @@ document.addEventListener('DOMContentLoaded', async () => {
   console.log('🚀 Initializing UMKM Desa Mlancu website...');
   
   // Wait for Supabase to be ready
-  await waitForSupabase();
+  const supabaseReady = await waitForSupabase();
   
-  // Check if Supabase is configured
-  if (!window.supabase && !window.supabaseClient) {
-    console.warn('⚠️ Supabase not configured. Using default data.');
-    console.log('📝 Please configure config.js with your Supabase credentials.');
+  if (!supabaseReady) {
+    console.warn('⚠️ Supabase not ready. Using default data.');
     loadDefaultProducts();
     return;
   }
 
   // Fetch all data from database
   console.log('📡 Fetching data from Supabase...');
-  await Promise.all([
-    fetchProducts(),
-    fetchProducers(),
-    fetchGallery(),
-    fetchTestimonials(),
-    fetchSettings()
-  ]);
-
-  console.log('✅ All data loaded successfully!');
+  try {
+    await Promise.all([
+      fetchProducts(),
+      fetchProducers(),
+      fetchGallery(),
+      fetchTestimonials(),
+      fetchSettings()
+    ]);
+    console.log('✅ All data loaded successfully!');
+  } catch (error) {
+    console.error('❌ Error loading data:', error);
+    loadDefaultProducts();
+  }
 });
 
 // Toast
