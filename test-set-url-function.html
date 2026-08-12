@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test setImageFromUrl Function</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      padding: 40px;
+      max-width: 800px;
+      margin: 0 auto;
+      background: #0a0a0a;
+      color: #e0e0e0;
+    }
+    h1 { color: #d4a373; }
+    .status-box {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 20px 0;
+    }
+    .btn {
+      background: #d4a373;
+      color: #0a0a0a;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 8px 8px 8px 0;
+    }
+    .btn:hover { background: #c09060; }
+    pre {
+      background: #0f0f0f;
+      padding: 16px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 0.9em;
+      border: 1px solid #333;
+    }
+    .success { color: #4ade80; }
+    .error { color: #f87171; }
+  </style>
+</head>
+<body>
+  <h1>🧪 Test: setImageFromUrl Function</h1>
+  <p style="color: #888;">Test apakah function window.setImageFromUrl available</p>
+
+  <div class="status-box">
+    <h3>Test Results:</h3>
+    <pre id="results">Running tests...</pre>
+  </div>
+
+  <div class="status-box">
+    <h3>Actions:</h3>
+    <button class="btn" onclick="runTests()">🔄 Run Tests Again</button>
+    <button class="btn" onclick="testInlineCall()">🧪 Test Inline onclick</button>
+    <button class="btn" onclick="viewAdminScript()">📄 View admin-script.js First 20 Lines</button>
+  </div>
+
+  <div id="codeView" class="status-box" style="display: none;">
+    <h3>admin-script.js (First 20 Lines):</h3>
+    <pre id="codeContent"></pre>
+  </div>
+
+  <!-- Load scripts in correct order -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="admin-script.js"></script>
+
+  <script>
+    async function runTests() {
+      const resultsEl = document.getElementById('results');
+      let output = '';
+
+      // Test 1: Check if function exists
+      output += '═══════════════════════════════════════\\n';
+      output += 'TEST 1: Function Existence\\n';
+      output += '═══════════════════════════════════════\\n';
+      const functionExists = typeof window.setImageFromUrl === 'function';
+      output += `window.setImageFromUrl type: ${typeof window.setImageFromUrl}\\n`;
+      output += `Result: ${functionExists ? '✅ EXISTS' : '❌ NOT FOUND'}\\n\\n`;
+
+      // Test 2: Check all global functions from admin-script
+      output += '═══════════════════════════════════════\\n';
+      output += 'TEST 2: All Global Functions\\n';
+      output += '═══════════════════════════════════════\\n';
+      const globalFunctions = [
+        'setImageFromUrl',
+        'editProduct',
+        'deleteProduct',
+        'editProducer',
+        'deleteProducer',
+        'editGallery',
+        'deleteGallery',
+        'editTestimonial',
+        'deleteTestimonial'
+      ];
+      
+      globalFunctions.forEach(funcName => {
+        const exists = typeof window[funcName] === 'function';
+        output += `window.${funcName}: ${exists ? '✅' : '❌'}\\n`;
+      });
+      output += '\\n';
+
+      // Test 3: Check script loading order
+      output += '═══════════════════════════════════════\\n';
+      output += 'TEST 3: Script Loading Order\\n';
+      output += '═══════════════════════════════════════\\n';
+      output += `Supabase CDN loaded: ${typeof window.supabase !== 'undefined' ? '✅' : '❌'}\\n`;
+      output += `SUPABASE_CONFIG: ${typeof window.SUPABASE_CONFIG !== 'undefined' ? '✅' : '❌'}\\n`;
+      output += `SUPABASE_READY: ${window.SUPABASE_READY ? '✅ true' : '⚠️ ' + window.SUPABASE_READY}\\n\\n`;
+
+      // Test 4: Check cache timestamp
+      output += '═══════════════════════════════════════\\n';
+      output += 'TEST 4: Cache Check\\n';
+      output += '═══════════════════════════════════════\\n';
+      try {
+        const response = await fetch('/admin-script.js?' + Date.now());
+        const text = await response.text();
+        const hasNewCode = text.includes('EXPOSE FUNCTIONS IMMEDIATELY');
+        output += `admin-script.js has latest code: ${hasNewCode ? '✅ YES' : '❌ NO (CACHED!)'}\\n`;
+        output += `File size: ${(text.length / 1024).toFixed(2)} KB\\n`;
+        output += `First line: ${text.split('\\n')[0]}\\n`;
+      } catch (error) {
+        output += `❌ Error checking file: ${error.message}\\n`;
+      }
+      output += '\\n';
+
+      // Test 5: Function source check
+      if (functionExists) {
+        output += '═══════════════════════════════════════\\n';
+        output += 'TEST 5: Function Details\\n';
+        output += '═══════════════════════════════════════\\n';
+        const funcStr = window.setImageFromUrl.toString();
+        output += `Function length: ${funcStr.length} chars\\n`;
+        output += `First 100 chars:\\n${funcStr.substring(0, 100)}...\\n`;
+      }
+
+      output += '\\n═══════════════════════════════════════\\n';
+      output += functionExists ? 
+        '✅ RESULT: Function is available and ready!' : 
+        '❌ RESULT: Function NOT FOUND - Browser cache issue!';
+      output += '\\n═══════════════════════════════════════';
+
+      resultsEl.textContent = output;
+      
+      if (!functionExists) {
+        resultsEl.textContent += '\\n\\n🔧 SOLUTION:\\n' +
+          '1. Hard refresh: Ctrl + Shift + R\\n' +
+          '2. Or try Incognito: Ctrl + Shift + N\\n' +
+          '3. Or clear cache: Ctrl + Shift + Delete';
+      }
+    }
+
+    function testInlineCall() {
+      try {
+        if (typeof window.setImageFromUrl === 'function') {
+          alert('✅ Function exists!\\n\\nYou can safely call it from inline onclick handlers.\\n\\nExample:\\nonclick="window.setImageFromUrl(\\'heroBanner\\')"');
+        } else {
+          alert('❌ Function NOT FOUND!\\n\\nThis means browser is loading OLD cached admin-script.js\\n\\nSolution: Hard refresh with Ctrl+Shift+R');
+        }
+      } catch (error) {
+        alert('❌ Error: ' + error.message);
+      }
+    }
+
+    async function viewAdminScript() {
+      const codeView = document.getElementById('codeView');
+      const codeContent = document.getElementById('codeContent');
+      
+      try {
+        const response = await fetch('/admin-script.js?' + Date.now());
+        const text = await response.text();
+        const first20Lines = text.split('\\n').slice(0, 25).join('\\n');
+        
+        codeContent.textContent = first20Lines;
+        codeView.style.display = 'block';
+      } catch (error) {
+        codeContent.textContent = 'Error: ' + error.message;
+        codeView.style.display = 'block';
+      }
+    }
+
+    // Run tests automatically on load
+    setTimeout(runTests, 500);
+  </script>
+</body>
+</html>
