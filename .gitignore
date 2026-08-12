@@ -1,10 +1,9 @@
 .vercel
 
-# Environment variables (JANGAN PUSH!)
+# Environment variables (local only)
 .env
 .env.local
 .env.production
-config.js
 
 # OS
 .DS_Store

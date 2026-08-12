@@ -60,15 +60,18 @@ Dashboard admin tidak bisa diklik karena **Storage Buckets belum dibuat**. Ikuti
 
 ---
 
-## ✅ LANGKAH 4: Deploy Ulang ke Vercel (Opsional)
+## ✅ LANGKAH 4: Verifikasi Environment Variables di Vercel
 
-Jika sudah fix database dan storage, deploy ulang:
+**PENTING**: `config.js` sudah dihapus dari GitHub untuk keamanan. Pastikan environment variables sudah di-set di Vercel:
 
-```bash
-git add .
-git commit -m "Fix: Database policies and storage setup"
-git push origin main
-```
+1. Buka **Vercel Dashboard**: https://vercel.com/
+2. Pilih project **umkm**
+3. Klik **Settings** → **Environment Variables**
+4. Pastikan ada 2 variables:
+   - `VITE_SUPABASE_URL` = `https://jrbvxdstpobmfavurvsh.supabase.co`
+   - `VITE_SUPABASE_ANON_KEY` = `eyJhbGci...` (anon key lengkap)
+5. Jika belum ada, tambahkan sekarang
+6. **Redeploy** project (Settings → Deployments → klik titik 3 → Redeploy)
 
 Vercel akan auto-deploy dalam 1-2 menit.
 
