@@ -405,10 +405,21 @@ function renderProducts() {
 
 // Render Producers
 function renderProducers() {
-  if (!PRODUCERS.length) return;
+  console.log('🎨 renderProducers called, data count:', PRODUCERS.length);
+  
+  if (!PRODUCERS.length) {
+    console.log('⚠️ No producers data to render');
+    return;
+  }
 
   const producersContainer = document.querySelector('#producers .grid');
-  if (!producersContainer) return;
+  
+  if (!producersContainer) {
+    console.error('❌ Producers container not found: #producers .grid');
+    return;
+  }
+  
+  console.log('✅ Producers container found, rendering...');
 
   producersContainer.innerHTML = PRODUCERS.map(p => `
     <div class="feature reveal" style="text-align: left; padding: 32px; cursor: pointer; transition: transform 0.3s ease;" onclick="window.location.href='producer-detail.html?slug=${p.slug || ''}'">
@@ -437,6 +448,8 @@ function renderProducers() {
       </div>
     </div>
   `).join('');
+  
+  console.log('✅ Producers rendered successfully');
 
   // Re-observe for reveal animation
   document.querySelectorAll('#producers .reveal').forEach(el => io.observe(el));
