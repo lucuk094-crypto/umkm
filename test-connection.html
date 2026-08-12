@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Supabase Connection</title>
+  <style>
+    body { font-family: monospace; padding: 20px; background: #1a1208; color: #f5f1e8; }
+    .test { padding: 10px; margin: 10px 0; border-radius: 5px; }
+    .success { background: rgba(100, 200, 150, 0.2); border: 1px solid #64c896; }
+    .error { background: rgba(226, 92, 92, 0.2); border: 1px solid #e25c5c; }
+    .info { background: rgba(212, 163, 115, 0.2); border: 1px solid #d4a373; }
+    pre { background: #0a0604; padding: 10px; border-radius: 5px; overflow-x: auto; }
+    button { background: #d4a373; color: #1a1208; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 5px; }
+  </style>
+</head>
+<body>
+  <h1>🧪 Test Supabase Connection & Permissions</h1>
+  <button onclick="runAllTests()">Run All Tests</button>
+  <button onclick="testAuth()">Test Auth</button>
+  <button onclick="testRead()">Test Read</button>
+  <button onclick="testWrite()">Test Write</button>
+  <div id="results"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="supabase-helper.js"></script>
+
+  <script>
+    const results = document.getElementById('results');
+
+    function log(message, type = 'info') {
+      const div = document.createElement('div');
+      div.className = `test ${type}`;
+      div.innerHTML = message;
+      results.appendChild(div);
+    }
+
+    async function runAllTests() {
+      results.innerHTML = '';
+      await testAuth();
+      await testRead();
+      await testWrite();
+    }
+
+    async function testAuth() {
+      log('<h3>1️⃣ Testing Authentication</h3>', 'info');
+      
+      // Wait for supabase
+      await new Promise(resolve => {
+        const check = () => {
+          if (window.supabase) resolve();
+          else setTimeout(check, 100);
+        };
+        check();
+      });
+
+      const { data: { session }, error } = await window.supabase.auth.getSession();
+      
+      if (error) {
+        log(`❌ Auth Error: <pre>${JSON.stringify(error, null, 2)}</pre>`, 'error');
+      } else if (session) {
+        log(`✅ User authenticated: ${session.user.email}`, 'success');
+        log(`<pre>User ID: ${session.user.id}\nRole: ${session.user.role || 'authenticated'}</pre>`, 'info');
+      } else {
+        log(`⚠️ Not authenticated. Please login first at <a href="admin-login.html">admin-login.html</a>`, 'error');
+      }
+    }
+
+    async function testRead() {
+      log('<h3>2️⃣ Testing Read Permissions</h3>', 'info');
+      
+      const tables = ['products', 'producers', 'gallery', 'testimonials', 'orders', 'settings'];
+      
+      for (const table of tables) {
+        try {
+          const { data, error } = await window.supabase.from(table).select('*').limit(1);
+          
+          if (error) {
+            log(`❌ ${table}: <pre>${JSON.stringify(error, null, 2)}</pre>`, 'error');
+          } else {
+            log(`✅ ${table}: Read OK (${data.length} rows)`, 'success');
+          }
+        } catch (e) {
+          log(`❌ ${table}: Exception - ${e.message}`, 'error');
+        }
+      }
+    }
+
+    async function testWrite() {
+      log('<h3>3️⃣ Testing Write Permissions</h3>', 'info');
+      
+      // Test insert to products
+      const testProduct = {
+        name: 'TEST PRODUCT - DELETE ME',
+        category: 'Food',
+        price: 1000,
+        is_active: false
+      };
+
+      try {
+        const { data, error } = await window.supabase
+          .from('products')
+          .insert([testProduct])
+          .select();
+        
+        if (error) {
+          log(`❌ Insert test failed:<pre>${JSON.stringify(error, null, 2)}</pre>`, 'error');
+          
+          if (error.code === '42501') {
+            log(`⚠️ <strong>RLS POLICY ERROR!</strong><br>You need to run <strong>FIX-DATABASE-COMPLETE.sql</strong> in Supabase SQL Editor`, 'error');
+          }
+        } else {
+          log(`✅ Insert test: Success`, 'success');
+          log(`<pre>${JSON.stringify(data, null, 2)}</pre>`, 'info');
+          
+          // Clean up - delete test product
+          if (data && data[0]) {
+            const { error: deleteError } = await window.supabase
+              .from('products')
+              .delete()
+              .eq('id', data[0].id);
+            
+            if (deleteError) {
+              log(`⚠️ Cleanup failed: ${deleteError.message}`, 'error');
+            } else {
+              log(`✅ Cleanup: Test product deleted`, 'success');
+            }
+          }
+        }
+      } catch (e) {
+        log(`❌ Exception: ${e.message}`, 'error');
+      }
+    }
+
+    // Auto-run on page load
+    window.addEventListener('load', () => {
+      setTimeout(runAllTests, 1000);
+    });
+  </script>
+</body>
+</html>
