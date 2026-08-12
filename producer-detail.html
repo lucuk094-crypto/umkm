@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profil Pengrajin - UMKM Desa Mlancu</title>
+  <meta name="description" content="Profil lengkap pengrajin UMKM Desa Mlancu" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  
+  <style>
+    /* Additional styles for producer detail page */
+    .producer-hero {
+      position: relative;
+      padding: 120px 0 80px;
+      background: linear-gradient(135deg, #1a1208 0%, #2d1f0e 100%);
+      overflow: hidden;
+    }
+    
+    .producer-hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><path d="M0,300 Q300,200 600,300 T1200,300 L1200,600 L0,600 Z" fill="rgba(197,151,93,0.05)"/></svg>');
+      background-size: cover;
+      opacity: 0.3;
+    }
+    
+    .producer-profile {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      gap: 48px;
+      align-items: flex-start;
+    }
+    
+    .producer-photo-large {
+      width: 200px;
+      height: 200px;
+      border-radius: 20px;
+      object-fit: cover;
+      border: 4px solid var(--gold);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    
+    .producer-photo-placeholder {
+      width: 200px;
+      height: 200px;
+      border-radius: 20px;
+      background: var(--grad-gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      font-weight: bold;
+      color: #1a1208;
+      border: 4px solid var(--gold);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    
+    .producer-info {
+      flex: 1;
+    }
+    
+    .producer-name {
+      font-size: 3rem;
+      font-family: 'Playfair Display', serif;
+      color: var(--gold);
+      margin-bottom: 12px;
+    }
+    
+    .producer-role {
+      font-size: 1.3rem;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+    
+    .producer-badges {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+    
+    .badge {
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--glass);
+      font-size: 0.875rem;
+      color: var(--fg);
+    }
+    
+    .producer-actions {
+      display: flex;
+      gap: 16px;
+      margin-top: 24px;
+    }
+    
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin: 48px 0;
+    }
+    
+    .info-card {
+      padding: 32px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+    }
+    
+    .info-card h3 {
+      color: var(--gold);
+      margin-bottom: 16px;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .info-card .icon {
+      font-size: 1.5rem;
+    }
+    
+    .info-item {
+      margin-bottom: 12px;
+      line-height: 1.8;
+    }
+    
+    .info-item strong {
+      color: var(--gold);
+      min-width: 140px;
+      display: inline-block;
+    }
+  </style>
+</head>
+
+<body id="top">
+  <!-- Navbar -->
+  <header class="navbar scrolled" id="navbar">
+    <nav class="nav-inner">
+      <a href="index.html" class="logo"><span class="gold">UMKM</span> Desa Mlancu</a>
+      <ul class="nav-links">
+        <li><a href="index.html#menu">Produk</a></li>
+        <li><a href="index.html#about">Tentang</a></li>
+        <li><a href="index.html#producers">Pengusaha</a></li>
+        <li><a href="index.html#gallery">Galeri</a></li>
+        <li><a href="index.html#contact">Pesan</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="index.html" class="btn btn-ghost">← Kembali</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Producer Hero -->
+  <section class="producer-hero">
+    <div class="container">
+      <div class="producer-profile">
+        <div id="producerPhotoContainer"></div>
+        <div class="producer-info">
+          <h1 class="producer-name" id="producerName">Loading...</h1>
+          <p class="producer-role" id="producerRole"></p>
+          <div class="producer-badges" id="producerBadges"></div>
+          <p class="lead-sm" id="producerDescription"></p>
+          <div class="producer-actions">
+            <a href="#" id="whatsappBtn" class="btn btn-primary" target="_blank">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+              </svg>
+              Hubungi via WhatsApp
+            </a>
+            <a href="index.html#producers" class="btn btn-ghost">Lihat Pengrajin Lain</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Producer Details -->
+  <section class="section">
+    <div class="container">
+      <!-- Info Grid -->
+      <div class="info-grid">
+        <!-- Identitas -->
+        <div class="info-card reveal">
+          <h3><span class="icon">👤</span> Identitas Usaha</h3>
+          <div class="info-item"><strong>Nama Pemilik:</strong> <span id="ownerName">-</span></div>
+          <div class="info-item"><strong>Nama Usaha:</strong> <span id="businessName">-</span></div>
+          <div class="info-item"><strong>Nama Pembuat:</strong> <span id="makerName">-</span></div>
+          <div class="info-item"><strong>Status Usaha:</strong> <span id="businessStatus">-</span></div>
+        </div>
+
+        <!-- Kontak -->
+        <div class="info-card reveal">
+          <h3><span class="icon">📞</span> Kontak & Lokasi</h3>
+          <div class="info-item"><strong>WhatsApp:</strong> <span id="whatsappDisplay">-</span></div>
+          <div class="info-item"><strong>Email:</strong> <span id="emailDisplay">-</span></div>
+          <div class="info-item"><strong>Alamat:</strong> <span id="fullAddress">-</span></div>
+          <div class="info-item"><strong>Dusun:</strong> <span id="village">-</span></div>
+        </div>
+
+        <!-- Usaha -->
+        <div class="info-card reveal">
+          <h3><span class="icon">🏭</span> Informasi Usaha</h3>
+          <div class="info-item"><strong>Tahun Mulai:</strong> <span id="sinceYear">-</span></div>
+          <div class="info-item"><strong>Jumlah Anggota:</strong> <span id="teamSize">-</span> orang</div>
+          <div class="info-item"><strong>Produk:</strong> <span id="productsOffered">-</span></div>
+        </div>
+      </div>
+
+      <!-- Cerita Usaha -->
+      <div class="reveal" style="margin-top: 48px;">
+        <div class="info-card">
+          <h3><span class="icon">📖</span> Cerita Usaha</h3>
+          <p class="muted" id="storyContent" style="line-height: 1.8; white-space: pre-line;">Loading...</p>
+        </div>
+      </div>
+
+      <!-- Prestasi -->
+      <div class="reveal" style="margin-top: 24px;" id="achievementsSection">
+        <div class="info-card">
+          <h3><span class="icon">🏆</span> Prestasi & Pencapaian</h3>
+          <p class="muted" id="achievementsContent" style="line-height: 1.8; white-space: pre-line;"></p>
+        </div>
+      </div>
+
+      <!-- Produk dari Pengrajin Ini -->
+      <div style="margin-top: 60px;">
+        <div class="reveal center">
+          <h2 class="display-2">Produk dari <span class="italic gold" id="producerNameProducts"></span></h2>
+          <p class="muted">Lihat semua produk yang dibuat oleh pengrajin ini</p>
+        </div>
+        <div class="grid grid-3" id="producerProductsGrid" style="margin-top: 40px;">
+          <!-- Products will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div>
+        <div class="logo"><span class="gold">UMKM</span> Desa Mlancu</div>
+        <p class="muted small">Platform jual beli produk UMKM lokal Desa Mlancu.</p>
+      </div>
+      <div>
+        <h4>Lokasi</h4>
+        <p class="muted small">Balai Desa Mlancu<br />Desa Mlancu · Setiap Hari 08.00-20.00</p>
+      </div>
+      <div>
+        <h4>Terhubung</h4>
+        <p class="muted small">Instagram · Pinterest · Twitter</p>
+      </div>
+    </div>
+    <div class="copyright">© <span id="year"></span> UMKM Desa Mlancu. Seluruh hak cipta dilindungi undang-undang.</div>
+  </footer>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // Get slug from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const slug = urlParams.get('slug');
+    
+    let producer = null;
+    
+    // Set year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    
+    // Fetch producer data
+    async function loadProducerDetail() {
+      if (!slug) {
+        window.location.href = 'index.html#producers';
+        return;
+      }
+      
+      try {
+        // Fetch producer by slug
+        const { data, error } = await supabase
+          .from('producers')
+          .select('*')
+          .eq('slug', slug)
+          .single();
+        
+        if (error) throw error;
+        if (!data) {
+          alert('Pengrajin tidak ditemukan');
+          window.location.href = 'index.html#producers';
+          return;
+        }
+        
+        producer = data;
+        renderProducerDetail(producer);
+        loadProducerProducts(producer.id);
+        
+      } catch (error) {
+        console.error('Error loading producer:', error);
+        alert('Gagal memuat data pengrajin');
+        window.location.href = 'index.html#producers';
+      }
+    }
+    
+    // Render producer detail
+    function renderProducerDetail(p) {
+      // Photo
+      const photoContainer = document.getElementById('producerPhotoContainer');
+      if (p.photo_url) {
+        photoContainer.innerHTML = `<img src="${p.photo_url}" alt="${p.name}" class="producer-photo-large">`;
+      } else {
+        const initials = p.name.split(' ').map(n => n[0]).join('').substring(0, 2);
+        photoContainer.innerHTML = `<div class="producer-photo-placeholder">${initials}</div>`;
+      }
+
+      
+      // Basic info
+      document.getElementById('producerName').textContent = p.name;
+      document.getElementById('producerRole').textContent = p.role || 'Pengrajin UMKM Desa Mlancu';
+      document.getElementById('producerDescription').textContent = p.description || p.story?.substring(0, 200) || '';
+      
+      // Badges
+      const badges = [];
+      if (p.since_year) badges.push(`Sejak ${p.since_year}`);
+      if (p.team_size) badges.push(`${p.team_size} Anggota`);
+      if (p.business_status) badges.push(p.business_status);
+      
+      document.getElementById('producerBadges').innerHTML = badges.map(b => 
+        `<span class="badge">${b}</span>`
+      ).join('');
+      
+      // WhatsApp button
+      if (p.whatsapp) {
+        const waBtn = document.getElementById('whatsappBtn');
+        waBtn.href = `https://wa.me/${p.whatsapp}?text=${encodeURIComponent(`Halo ${p.name}, saya tertarik dengan produk Anda`)}`;
+      }
+      
+      // Identity
+      document.getElementById('ownerName').textContent = p.owner_name || p.name;
+      document.getElementById('businessName').textContent = p.business_name || '-';
+      document.getElementById('makerName').textContent = p.maker_name || p.name;
+      document.getElementById('businessStatus').textContent = p.business_status || '-';
+      
+      // Contact
+      document.getElementById('whatsappDisplay').textContent = p.whatsapp || '-';
+      document.getElementById('emailDisplay').textContent = p.email || '-';
+      document.getElementById('fullAddress').textContent = p.full_address || p.address || '-';
+      document.getElementById('village').textContent = p.village || '-';
+
+      
+      // Business info
+      document.getElementById('sinceYear').textContent = p.since_year || '-';
+      document.getElementById('teamSize').textContent = p.team_size || '-';
+      document.getElementById('productsOffered').textContent = p.products_offered || p.role || '-';
+      
+      // Story
+      document.getElementById('storyContent').textContent = p.story || 'Belum ada cerita usaha yang ditambahkan.';
+      
+      // Achievements
+      if (p.achievements) {
+        document.getElementById('achievementsContent').textContent = p.achievements;
+      } else {
+        document.getElementById('achievementsSection').style.display = 'none';
+      }
+      
+      // Set title
+      document.title = `${p.name} - Profil Pengrajin UMKM Desa Mlancu`;
+      document.getElementById('producerNameProducts').textContent = p.name;
+    }
+    
+    // Load products from this producer
+    async function loadProducerProducts(producerId) {
+      try {
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .eq('producer_id', producerId)
+          .eq('is_active', true)
+          .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        
+        const grid = document.getElementById('producerProductsGrid');
+        
+        if (!data || data.length === 0) {
+          grid.innerHTML = '<p class="muted center" style="grid-column: 1/-1;">Belum ada produk yang ditambahkan.</p>';
+          return;
+        }
+
+        
+        grid.innerHTML = data.map(p => `
+          <article class="product reveal">
+            <div class="product-img">
+              <span class="product-cat">${p.category}</span>
+              <img src="${p.image_url || 'https://via.placeholder.com/400'}" alt="${p.name}" loading="lazy"/>
+            </div>
+            <div class="product-body">
+              <div class="product-row">
+                <h3>${p.name}</h3>
+                <span class="product-price">Rp ${p.price.toLocaleString('id-ID')}</span>
+              </div>
+              <p class="muted small">${p.description || ''}</p>
+              ${p.process ? `<p class="muted small" style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); font-size: 0.8rem;"><b style="color: var(--gold);">Proses:</b> ${p.process}</p>` : ''}
+              <button class="add-btn" onclick="orderProduct('${p.id}')" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                Pesan via WhatsApp
+              </button>
+            </div>
+          </article>
+        `).join('');
+        
+      } catch (error) {
+        console.error('Error loading products:', error);
+      }
+    }
+    
+    // Order product via WhatsApp
+    function orderProduct(productId) {
+      // This will be implemented with product data
+      if (producer && producer.whatsapp) {
+        window.open(`https://wa.me/${producer.whatsapp}?text=${encodeURIComponent('Halo, saya tertarik memesan produk Anda')}`, '_blank');
+      }
+    }
+
+    
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (typeof supabase === 'undefined' || !supabase) {
+        alert('Website belum dikonfigurasi. Silakan setup Supabase terlebih dahulu.');
+        window.location.href = 'index.html';
+        return;
+      }
+      
+      await loadProducerDetail();
+      
+      // Reveal animation
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => { 
+          if (e.isIntersecting) { 
+            e.target.classList.add('in'); 
+            io.unobserve(e.target); 
+          } 
+        });
+      }, { threshold: 0.12 });
+      
+      document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+    });
+  </script>
+</body>
+</html>
