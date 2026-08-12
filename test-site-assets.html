@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Site Assets Setup</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #0a0a0a;
+      color: #fff;
+    }
+    h1 {
+      color: #8B4513;
+      border-bottom: 2px solid #8B4513;
+      padding-bottom: 10px;
+    }
+    .test-section {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    .test-section h2 {
+      margin-top: 0;
+      color: #d4a574;
+    }
+    .status {
+      padding: 10px;
+      border-radius: 5px;
+      margin: 10px 0;
+      font-weight: bold;
+    }
+    .status.pending {
+      background: #444;
+      color: #fff;
+    }
+    .status.success {
+      background: #1a4d1a;
+      color: #66ff66;
+    }
+    .status.error {
+      background: #4d1a1a;
+      color: #ff6666;
+    }
+    .status.warning {
+      background: #4d4d1a;
+      color: #ffff66;
+    }
+    pre {
+      background: #0d0d0d;
+      border: 1px solid #333;
+      border-radius: 4px;
+      padding: 10px;
+      overflow-x: auto;
+      font-size: 12px;
+    }
+    button {
+      background: #8B4513;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 10px 5px 10px 0;
+    }
+    button:hover {
+      background: #a0522d;
+    }
+    button:disabled {
+      background: #555;
+      cursor: not-allowed;
+    }
+    .data-item {
+      background: #0d0d0d;
+      border-left: 3px solid #8B4513;
+      padding: 10px;
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔍 Test Site Assets Setup</h1>
+  <p>Tool ini akan mengecek apakah setup Site Assets Management sudah benar.</p>
+
+  <button onclick="runAllTests()">▶️ Run All Tests</button>
+
+  <!-- Test 1: Supabase Connection -->
+  <div class="test-section">
+    <h2>1️⃣ Supabase Connection</h2>
+    <div id="test1-status" class="status pending">⏳ Pending...</div>
+    <div id="test1-details"></div>
+  </div>
+
+  <!-- Test 2: Settings Table -->
+  <div class="test-section">
+    <h2>2️⃣ Settings Table</h2>
+    <div id="test2-status" class="status pending">⏳ Pending...</div>
+    <div id="test2-details"></div>
+  </div>
+
+  <!-- Test 3: Storage Bucket -->
+  <div class="test-section">
+    <h2>3️⃣ Storage Bucket "site-assets"</h2>
+    <div id="test3-status" class="status pending">⏳ Pending...</div>
+    <div id="test3-details"></div>
+  </div>
+
+  <!-- Test 4: Upload Test -->
+  <div class="test-section">
+    <h2>4️⃣ Upload Test (Optional)</h2>
+    <div id="test4-status" class="status pending">⏳ Pending...</div>
+    <div id="test4-details"></div>
+    <button onclick="testUpload()" id="uploadTestBtn" disabled>🧪 Test Upload</button>
+  </div>
+
+  <!-- Final Result -->
+  <div class="test-section">
+    <h2>📋 Summary</h2>
+    <div id="summary"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script>
+    const results = {
+      test1: null,
+      test2: null,
+      test3: null,
+      test4: null
+    };
+
+    async function runAllTests() {
+      console.log('Starting all tests...');
+      
+      await test1_supabaseConnection();
+      await test2_settingsTable();
+      await test3_storageBucket();
+      
+      showSummary();
+      
+      // Enable upload test if all other tests pass
+      if (results.test1 && results.test2 && results.test3) {
+        document.getElementById('uploadTestBtn').disabled = false;
+      }
+    }
+
+    async function test1_supabaseConnection() {
+      const statusEl = document.getElementById('test1-status');
+      const detailsEl = document.getElementById('test1-details');
+      
+      statusEl.textContent = '⏳ Testing...';
+      statusEl.className = 'status pending';
+      
+      try {
+        console.log('Test 1: Checking Supabase connection...');
+        
+        if (typeof window.supabase === 'undefined') {
+          throw new Error('window.supabase is not defined. Check config.js');
+        }
+        
+        console.log('Supabase object found:', window.supabase);
+        
+        // Try to fetch data from any table
+        const { data, error } = await window.supabase
+          .from('products')
+          .select('id')
+          .limit(1);
+        
+        if (error) {
+          throw error;
+        }
+        
+        console.log('Connection test successful!');
+        
+        statusEl.textContent = '✅ SUCCESS - Supabase connected!';
+        statusEl.className = 'status success';
+        detailsEl.innerHTML = `
+          <div class="data-item">
+            <strong>Status:</strong> Connected<br>
+            <strong>URL:</strong> ${window.supabase.supabaseUrl}
+          </div>
+        `;
+        
+        results.test1 = true;
+        
+      } catch (error) {
+        console.error('Test 1 failed:', error);
+        
+        statusEl.textContent = '❌ FAILED - Cannot connect to Supabase';
+        statusEl.className = 'status error';
+        detailsEl.innerHTML = `
+          <div class="data-item">
+            <strong>Error:</strong> ${error.message}<br>
+            <strong>Fix:</strong> Pastikan config.js sudah benar dan Supabase credentials valid
+          </div>
+        `;
+        
+        results.test1 = false;
+      }
+    }
+
+    async function test2_settingsTable() {
+      const statusEl = document.getElementById('test2-status');
+      const detailsEl = document.getElementById('test2-details');
+      
+      if (!results.test1) {
+        statusEl.textContent = '⏭️ SKIPPED - Supabase not connected';
+        statusEl.className = 'status warning';
+        return;
+      }
+      
+      statusEl.textContent = '⏳ Testing...';
+      statusEl.className = 'status pending';
+      
+      try {
+        console.log('Test 2: Checking settings table...');
+        
+        const { data, error } = await window.supabase
+          .from('settings')
+          .select('key, value, description')
+          .in('key', ['hero_banner_url', 'about_image_url', 'site_logo_url']);
+        
+        if (error) {
+          throw error;
+        }
+        
+        console.log('Settings data:', data);
+        
+        const requiredKeys = ['hero_banner_url', 'about_image_url', 'site_logo_url'];
+        const foundKeys = data.map(d => d.key);
+        const missingKeys = requiredKeys.filter(k => !foundKeys.includes(k));
+        
+        if (missingKeys.length > 0) {
+          statusEl.textContent = '⚠️ WARNING - Some settings missing';
+          statusEl.className = 'status warning';
+          detailsEl.innerHTML = `
+            <div class="data-item">
+              <strong>Found:</strong> ${foundKeys.join(', ')}<br>
+              <strong>Missing:</strong> ${missingKeys.join(', ')}<br>
+              <strong>Fix:</strong> Run ADD-SITE-ASSETS.sql di Supabase SQL Editor
+            </div>
+          `;
+          results.test2 = false;
+        } else {
+          statusEl.textContent = '✅ SUCCESS - All settings found!';
+          statusEl.className = 'status success';
+          
+          let html = '<strong>Settings:</strong>';
+          data.forEach(item => {
+            html += `
+              <div class="data-item">
+                <strong>${item.key}:</strong><br>
+                ${item.description || 'No description'}<br>
+                <code>${item.value || '(empty)'}</code>
+              </div>
+            `;
+          });
+          
+          detailsEl.innerHTML = html;
+          results.test2 = true;
+        }
+        
+      } catch (error) {
+        console.error('Test 2 failed:', error);
+        
+        statusEl.textContent = '❌ FAILED - Cannot read settings table';
+        statusEl.className = 'status error';
+        detailsEl.innerHTML = `
+          <div class="data-item">
+            <strong>Error:</strong> ${error.message}<br>
+            <strong>Fix:</strong> 
+            ${error.code === '42P01' ? 
+              'Table "settings" tidak ada. Run SETUP-SUPABASE.sql dulu.' : 
+              error.code === '42501' ?
+              'Permission denied. Run FIX-RLS-POLICIES.sql untuk fix RLS.' :
+              'Cek error di console dan pastikan database setup benar.'
+            }
+          </div>
+        `;
+        
+        results.test2 = false;
+      }
+    }
+
+    async function test3_storageBucket() {
+      const statusEl = document.getElementById('test3-status');
+      const detailsEl = document.getElementById('test3-details');
+      
+      if (!results.test1) {
+        statusEl.textContent = '⏭️ SKIPPED - Supabase not connected';
+        statusEl.className = 'status warning';
+        return;
+      }
+      
+      statusEl.textContent = '⏳ Testing...';
+      statusEl.className = 'status pending';
+      
+      try {
+        console.log('Test 3: Checking storage bucket...');
+        
+        // List buckets
+        const { data: buckets, error: listError } = await window.supabase
+          .storage
+          .listBuckets();
+        
+        if (listError) {
+          throw listError;
+        }
+        
+        console.log('Buckets:', buckets);
+        
+        const siteAssetsBucket = buckets.find(b => b.name === 'site-assets');
+        
+        if (!siteAssetsBucket) {
+          statusEl.textContent = '❌ FAILED - Bucket "site-assets" not found';
+          statusEl.className = 'status error';
+          detailsEl.innerHTML = `
+            <div class="data-item">
+              <strong>Available buckets:</strong> ${buckets.map(b => b.name).join(', ') || '(none)'}<br>
+              <strong>Fix:</strong> Buat bucket "site-assets" di Supabase Storage Dashboard dan set ke PUBLIC
+            </div>
+          `;
+          results.test3 = false;
+          return;
+        }
+        
+        // Check if bucket is public
+        if (!siteAssetsBucket.public) {
+          statusEl.textContent = '⚠️ WARNING - Bucket exists but not PUBLIC';
+          statusEl.className = 'status warning';
+          detailsEl.innerHTML = `
+            <div class="data-item">
+              <strong>Bucket found:</strong> site-assets<br>
+              <strong>Public:</strong> ${siteAssetsBucket.public ? 'Yes ✅' : 'No ❌'}<br>
+              <strong>Fix:</strong> Set bucket "site-assets" to PUBLIC di Supabase Storage settings
+            </div>
+          `;
+          results.test3 = false;
+          return;
+        }
+        
+        // Try to list files in bucket
+        const { data: files, error: filesError } = await window.supabase
+          .storage
+          .from('site-assets')
+          .list('', { limit: 5 });
+        
+        if (filesError) {
+          throw filesError;
+        }
+        
+        console.log('Files in bucket:', files);
+        
+        statusEl.textContent = '✅ SUCCESS - Bucket ready!';
+        statusEl.className = 'status success';
+        detailsEl.innerHTML = `
+          <div class="data-item">
+            <strong>Bucket:</strong> site-assets<br>
+            <strong>Public:</strong> Yes ✅<br>
+            <strong>Files:</strong> ${files.length} file(s)<br>
+            ${files.length > 0 ? `<strong>Sample files:</strong> ${files.slice(0, 3).map(f => f.name).join(', ')}` : ''}
+          </div>
+        `;
+        
+        results.test3 = true;
+        
+      } catch (error) {
+        console.error('Test 3 failed:', error);
+        
+        statusEl.textContent = '❌ FAILED - Cannot access storage';
+        statusEl.className = 'status error';
+        detailsEl.innerHTML = `
+          <div class="data-item">
+            <strong>Error:</strong> ${error.message}<br>
+            <strong>Fix:</strong> Pastikan bucket "site-assets" sudah dibuat dan PUBLIC
+          </div>
+        `;
+        
+        results.test3 = false;
+      }
+    }
+
+    async function testUpload() {
+      const statusEl = document.getElementById('test4-status');
+      const detailsEl = document.getElementById('test4-details');
+      
+      statusEl.textContent = '⏳ Testing upload...';
+      statusEl.className = 'status pending';
+      
+      try {
+        // Create a test file (1x1 pixel PNG)
+        const testBlob = await fetch('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==')
+          .then(res => res.blob());
+        
+        const testFile = new File([testBlob], 'test-upload.png', { type: 'image/png' });
+        
+        console.log('Test upload: uploading test file...');
+        
+        const fileName = `test-${Date.now()}.png`;
+        const { data, error } = await window.supabase.storage
+          .from('site-assets')
+          .upload(fileName, testFile, {
+            cacheControl: '3600',
+            upsert: false
+          });
+        
+        if (error) {
+          throw error;
+        }
+        
+        console.log('Upload success:', data);
+        
+        // Get public URL
+        const { data: { publicUrl } } = window.supabase.storage
+          .from('site-assets')
+          .getPublicUrl(fileName);
+        
+        console.log('Public URL:', publicUrl);
+        
+        // Clean up: delete test file
+        await window.supabase.storage
+          .from('site-assets')
+          .remove([fileName]);
+        
+        statusEl.textContent = '✅ SUCCESS - Upload works!';
+        statusEl.className = 'status success';
+        detailsEl.innerHTML = `
+          <div class="data-item">
+            <strong>Test file uploaded:</strong> ${fileName}<br>
+            <strong>Public URL:</strong> <a href="${publicUrl}" target="_blank">${publicUrl}</a><br>
+            <strong>Status:</strong> File deleted after test
+          </div>
+        `;
+        
+        results.test4 = true;
+        
+      } catch (error) {
+        console.error('Test upload failed:', error);
+        
+        statusEl.textContent = '❌ FAILED - Upload failed';
+        statusEl.className = 'status error';
+        detailsEl.innerHTML = `
+          <div class="data-item">
+            <strong>Error:</strong> ${error.message}<br>
+            <strong>Fix:</strong> 
+            ${error.message.includes('policy') || error.message.includes('permission') ?
+              'RLS policy atau bucket permission tidak benar. Pastikan bucket PUBLIC dan RLS disabled untuk bucket storage.' :
+              'Cek error message dan console logs.'
+            }
+          </div>
+        `;
+        
+        results.test4 = false;
+      }
+    }
+
+    function showSummary() {
+      const summaryEl = document.getElementById('summary');
+      
+      const passed = Object.values(results).filter(r => r === true).length;
+      const total = 3; // Only count required tests (1-3)
+      
+      let status = '';
+      let message = '';
+      
+      if (passed === total) {
+        status = 'success';
+        message = '🎉 All tests passed! Site Assets Management is ready to use.';
+      } else if (passed > 0) {
+        status = 'warning';
+        message = `⚠️ ${passed}/${total} tests passed. Fix the failed tests above.`;
+      } else {
+        status = 'error';
+        message = '❌ Setup incomplete. Fix all errors above.';
+      }
+      
+      summaryEl.innerHTML = `
+        <div class="status ${status}">
+          ${message}
+        </div>
+        <div class="data-item">
+          <strong>Next steps:</strong><br>
+          ${passed === total ? 
+            '✅ Go to Dashboard Admin → Site Settings → Upload your images!' :
+            '1. Fix all failed tests<br>2. Run this test again<br>3. Once all pass, try uploading from Dashboard'
+          }
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>
