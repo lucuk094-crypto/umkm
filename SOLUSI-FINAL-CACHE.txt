@@ -1,0 +1,262 @@
+╔════════════════════════════════════════════════════════════════════╗
+║                                                                    ║
+║   🔥 SOLUSI FINAL: Cache Issue FIXED!                             ║
+║                                                                    ║
+╚════════════════════════════════════════════════════════════════════╝
+
+❌ ERROR YANG KAMU ALAMI:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+"Uncaught TypeError: window.setImageFromUrl is not a function"
+
+💡 ROOT CAUSE:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Browser cache = serving old admin-script.js
+2. Vercel CDN cache = serving old files to all users
+3. No cache-busting mechanism di script tags
+
+✅ SOLUSI YANG SUDAH DITERAPKAN:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. ✅ Added cache-busting query params ke semua script tags:
+   - admin-script.js?v=20260812-2
+   - config.js?v=20260812-2
+   - upload-helper.js?v=20260812-2
+   - product-admin.js?v=20260812-2
+
+2. ✅ Updated vercel.json dengan aggressive cache headers:
+   - admin-script.js → no-cache, no-store, must-revalidate
+   - admin-dashboard.html → no-cache, no-store, must-revalidate
+   - + Pragma: no-cache
+   - + Expires: 0
+
+3. ✅ Pushed to GitHub (commit: a6a7f55)
+
+
+🚀 CARA MENGGUNAKAN (LANGKAH DEMI LANGKAH):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+STEP 1: TUNGGU VERCEL DEPLOYMENT (PENTING!)
+   ⏰ Tunggu 2-3 menit untuk Vercel auto-deploy commit a6a7f55
+   
+   Check status:
+   → Buka: https://vercel.com/dashboard
+   → Go to project: umkn-kkn-desa-mlancu
+   → Tab: Deployments
+   → Latest deployment harus "Ready" ✅
+   
+   JANGAN LANJUT ke step 2 sebelum deployment selesai!
+
+
+STEP 2: HARD REFRESH (WAJIB!)
+   Windows/Linux:
+   ➜ Tekan: Ctrl + Shift + R
+   
+   Mac:
+   ➜ Tekan: Cmd + Shift + R
+   
+   Atau force refresh via DevTools:
+   ➜ Press F12
+   ➜ Right-click refresh button
+   ➜ Click "Empty Cache and Hard Reload"
+
+
+STEP 3: VERIFY SCRIPT LOADED
+   Buka Console (F12):
+   
+   ✅ Harus ada log ini:
+   ```
+   ✅ window.setImageFromUrl is now available
+      Type: function
+   ```
+   
+   ✅ Test manual di Console:
+   ```javascript
+   typeof window.setImageFromUrl
+   // Expected: "function"
+   ```
+   
+   ❌ Jika masih "undefined":
+   → ULANGI Step 2 (hard refresh lagi)
+   → Atau coba Incognito mode (Ctrl+Shift+N)
+
+
+STEP 4: TEST SET URL BUTTON
+   1. Login dashboard
+   2. Click menu "Site Assets"
+   3. Paste test URL:
+      https://i.ibb.co/84zR6qfT/hero-img.png
+   4. Click "Set URL" button
+   
+   ✅ Expected Console logs:
+   ```
+   🔗 Setting heroBanner from URL...
+   ⏳ Validating and saving URL...
+   ✅ Image loaded successfully
+   💾 Saving to database...
+   ✅ Database updated successfully
+   ```
+   
+   ✅ Expected UI changes:
+   - Toast notification muncul
+   - Preview image updates
+   - "URL saat ini" updates
+
+
+🔄 JIKA MASIH ERROR SETELAH STEP 1-4:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+OPTION A: Incognito Mode (Paling Reliable)
+   1. Tekan: Ctrl + Shift + N (Chrome/Edge)
+           atau Ctrl + Shift + P (Firefox)
+   2. Paste URL dashboard
+   3. Login dan test
+   4. Ini 100% bypass cache
+
+
+OPTION B: Clear All Browser Data
+   1. Tekan: Ctrl + Shift + Delete
+   2. Time range: "All time"
+   3. Checklist:
+      ✅ Browsing history
+      ✅ Cookies and site data
+      ✅ Cached images and files
+   4. Click "Clear data"
+   5. CLOSE browser completely
+   6. Re-open dan try again
+
+
+OPTION C: Different Browser
+   - Pakai Chrome? → Try Firefox
+   - Pakai Firefox? → Try Chrome
+   - Pakai Edge? → Try Chrome
+   
+   Fresh browser = no cache = guaranteed work
+
+
+OPTION D: Disable Cache via DevTools
+   1. Open dashboard
+   2. Press F12
+   3. Go to Network tab
+   4. Checklist: "Disable cache"
+   5. KEEP F12 OPEN (jangan close!)
+   6. Refresh page
+   7. Test Set URL button
+
+
+🧪 DIAGNOSTIC COMMANDS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Buka Console (F12) dan jalankan ini:
+
+// Test 1: Check if function exists
+console.log('Function exists:', typeof window.setImageFromUrl);
+// Expected: "function"
+
+// Test 2: Check script URL loaded
+[...document.querySelectorAll('script')]
+  .map(s => s.src)
+  .filter(src => src.includes('admin-script'))
+  .forEach(url => console.log('Script URL:', url));
+// Expected: admin-script.js?v=20260812-2
+
+// Test 3: Check file content
+fetch('/admin-script.js?v=20260812-2')
+  .then(r => r.text())
+  .then(code => {
+    console.log('Has setImageFromUrl:', code.includes('window.setImageFromUrl'));
+    console.log('Has loadSiteAssets:', code.includes('loadSiteAssets'));
+    console.log('File size:', (code.length / 1024).toFixed(2), 'KB');
+  });
+// Expected: all true + file size ~40-50KB
+
+// Test 4: Check Supabase ready
+console.log('SUPABASE_READY:', window.SUPABASE_READY);
+// Expected: true
+
+// Test 5: Manual function call
+if (typeof window.setImageFromUrl === 'function') {
+  console.log('✅ Function available, ready to use!');
+} else {
+  console.error('❌ Function NOT found - cache issue persists!');
+}
+
+
+📊 EXPECTED CONSOLE OUTPUT (SUCCESS):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Setelah hard refresh + vercel deployed, Console harus show:
+
+```
+🔧 Config.js loaded!
+✅ Supabase CDN loaded after 100ms
+✅ Supabase client initialized successfully!
+✅ window.SUPABASE_READY = true
+
+✅ window.setImageFromUrl is now available    <-- PENTING!
+   Type: function
+
+🚀 Dashboard initializing...
+✅ Supabase ready for dashboard
+🔐 Checking authentication...
+✅ Session found, user authenticated
+🔧 Setting up event listeners...
+✅ Event listeners setup complete
+```
+
+Key indicator: "✅ window.setImageFromUrl is now available"
+
+
+🎯 WHY THIS WILL WORK NOW:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Cache-busting query params (?v=20260812-2)
+   → Browser treats it as NEW file
+   → Forces fresh download
+
+2. Aggressive cache headers in vercel.json
+   → Vercel CDN won't cache admin files
+   → Always serve fresh from origin
+
+3. Multiple cache directives
+   → Cache-Control: no-cache, no-store
+   → Pragma: no-cache
+   → Expires: 0
+   → Triple protection against caching
+
+4. Version bumped in HTML
+   → ?v=20260812-2 is new version
+   → Browser must download new file
+
+
+📝 JIKA MASIH GAGAL (SCREENSHOT NEEDED):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Kirim screenshot:
+
+1. ✅ Vercel deployment status page
+   (showing commit a6a7f55 deployed)
+
+2. ✅ Browser Console (F12)
+   (full log from page load)
+
+3. ✅ Network tab
+   (showing admin-script.js request with ?v= param)
+
+4. ✅ Result dari diagnostic commands di atas
+
+5. ✅ Browser & version info
+   (Chrome 120? Firefox 122? Edge 120?)
+
+
+═══════════════════════════════════════════════════════════════════
+
+✅ SUMMARY:
+
+Problem: Browser + CDN cache serving old files
+Solution: Cache-busting query params + aggressive cache headers
+Status: DEPLOYED (commit a6a7f55)
+Action: Wait 2-3 min → Hard refresh (Ctrl+Shift+R) → Test
+
+Expected: window.setImageFromUrl is a function ✅
+
+═══════════════════════════════════════════════════════════════════
