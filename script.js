@@ -208,6 +208,27 @@ async function fetchSettings() {
 }
 
 function applySettings() {
+  // Update hero banner image if available
+  if (SETTINGS.hero_banner_url) {
+    const heroBanner = document.getElementById('heroBanner');
+    if (heroBanner) {
+      heroBanner.src = SETTINGS.hero_banner_url;
+    }
+  }
+  
+  // Update site title if available
+  if (SETTINGS.site_title) {
+    document.title = SETTINGS.site_title + ' — Platform Jual Beli Produk Lokal';
+  }
+  
+  // Update about image if available
+  if (SETTINGS.about_image_url) {
+    const aboutImage = document.querySelector('.about-image img');
+    if (aboutImage) {
+      aboutImage.src = SETTINGS.about_image_url;
+    }
+  }
+  
   // Update kontak WhatsApp jika ada di settings
   if (SETTINGS.whatsapp_number) {
     // Update semua link WhatsApp di halaman
