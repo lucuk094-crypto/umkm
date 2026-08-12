@@ -3,18 +3,42 @@
 // Wait for Supabase to initialize
 function waitForSupabase() {
   return new Promise((resolve) => {
+    console.log('⏳ waitForSupabase() called');
+    
+    // First, try to initialize if not done yet
+    if (window.initializeSupabase && (!window.supabase.from)) {
+      console.log('🔧 Calling window.initializeSupabase()...');
+      const initialized = window.initializeSupabase();
+      if (initialized) {
+        console.log('✅ Supabase initialized immediately');
+        resolve(true);
+        return;
+      }
+    }
+    
     let attempts = 0;
     const maxAttempts = 50; // 5 seconds max
     
     const checkSupabase = () => {
       attempts++;
       
+      console.log(`🔍 Checking Supabase (attempt ${attempts}/${maxAttempts})...`);
+      console.log('  window.supabase exists:', !!window.supabase);
+      console.log('  window.supabase.from exists:', !!(window.supabase && window.supabase.from));
+      console.log('  typeof window.supabase.from:', typeof (window.supabase && window.supabase.from));
+      
       // Check if supabase client has the methods we need
       if (window.supabase && typeof window.supabase.from === 'function') {
         console.log('✅ Supabase ready for website');
         resolve(true);
       } else if (attempts >= maxAttempts) {
-        console.warn('⚠️ Supabase timeout after 5 seconds');
+        console.error('⚠️ Supabase timeout after 5 seconds');
+        console.error('Final state:', {
+          supabaseExists: !!window.supabase,
+          supabaseType: typeof window.supabase,
+          hasFromMethod: !!(window.supabase && window.supabase.from),
+          supabaseKeys: window.supabase ? Object.keys(window.supabase).slice(0, 10) : []
+        });
         resolve(false);
       } else {
         setTimeout(checkSupabase, 100);
@@ -37,8 +61,20 @@ const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 // ===== FETCH DATA FROM SUPABASE =====
 
 async function fetchProducts() {
+  console.log('📦 Starting fetchProducts()...');
+  
   try {
-    await waitForSupabase(); // Wait for supabase to be ready
+    console.log('⏳ Waiting for Supabase...');
+    const supabaseReady = await waitForSupabase();
+    
+    if (!supabaseReady) {
+      console.error('❌ Supabase not ready, using default products');
+      loadDefaultProducts();
+      return;
+    }
+    
+    console.log('🔍 Attempting to fetch products from database...');
+    console.log('  Using client:', window.supabase);
     
     const { data, error } = await window.supabase
       .from('products')
@@ -46,7 +82,18 @@ async function fetchProducts() {
       .eq('is_active', true)
       .order('created_at', { ascending: false });
 
-    if (error) throw error;
+    console.log('📡 Database response:', { data, error });
+
+    if (error) {
+      console.error('❌ Database error:', error);
+      throw error;
+    }
+
+    if (!data || data.length === 0) {
+      console.warn('⚠️ No products found in database');
+      loadDefaultProducts();
+      return;
+    }
 
     // Transform data untuk kompatibilitas dengan kode existing
     PRODUCTS = data.map(p => ({
@@ -62,10 +109,15 @@ async function fetchProducts() {
       stock: p.stock || 0
     }));
 
-    console.log('✅ Products loaded:', PRODUCTS.length);
+    console.log('✅ Products loaded from database:', PRODUCTS.length);
+    console.log('📋 Products:', PRODUCTS);
     renderProducts();
   } catch (error) {
     console.error('❌ Error fetching products:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack
+    });
     // Fallback ke data default jika error
     loadDefaultProducts();
   }
