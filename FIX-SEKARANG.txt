@@ -1,0 +1,136 @@
+╔════════════════════════════════════════════════════════════════════╗
+║                                                                    ║
+║   🔥 FIX ERROR: window.setImageFromUrl is not a function          ║
+║                                                                    ║
+╚════════════════════════════════════════════════════════════════════╝
+
+❌ ERROR YANG KAMU ALAMI:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+"Uncaught TypeError: window.setImageFromUrl is not a function"
+
+💡 MASALAHNYA:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+100% BROWSER CACHE ISSUE!
+
+Function SUDAH ADA di code, tapi browser kamu masih pakai 
+JavaScript file LAMA yang cached.
+
+
+🚀 SOLUSI CEPAT (PILIH SALAH SATU):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+╔═══════════════════════════════════════════════════════════════════╗
+║  CARA 1: HARD REFRESH (Tercepat - 10 detik)                      ║
+╚═══════════════════════════════════════════════════════════════════╝
+
+   1. Buka Dashboard Admin
+   2. Tekan: Ctrl + Shift + R
+   3. Tunggu sampai page fully reload (2-3 detik)
+   4. Login lagi
+   5. Test Set URL button
+
+   Expected: Set URL button akan work!
+
+
+╔═══════════════════════════════════════════════════════════════════╗
+║  CARA 2: INCOGNITO MODE (Paling Aman - 100% Work)                ║
+╚═══════════════════════════════════════════════════════════════════╝
+
+   1. Tekan: Ctrl + Shift + N (Chrome/Edge)
+           atau Ctrl + Shift + P (Firefox)
+   2. Paste URL: 
+      https://umkn-kkn-desa-mlancu.vercel.app/admin-dashboard.html
+   3. Login
+   4. Test Set URL button
+
+   Keuntungan: 100% bypass cache, guaranteed fresh files
+
+
+╔═══════════════════════════════════════════════════════════════════╗
+║  CARA 3: CLEAR CACHE (Paling Thorough)                           ║
+╚═══════════════════════════════════════════════════════════════════╝
+
+   1. Tekan: Ctrl + Shift + Delete
+   2. Pilih time range: "All time"
+   3. Checklist:
+      ✅ Cookies and site data
+      ✅ Cached images and files
+   4. Click "Clear data"
+   5. Close dan re-open browser
+   6. Open dashboard lagi
+
+
+🧪 TEST DULU SEBELUM FIX:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Buka URL ini untuk test apakah function tersedia:
+
+   https://umkn-kkn-desa-mlancu.vercel.app/test-set-url-function.html
+
+Test page akan show:
+   ✅ Function exists: YES/NO
+   ✅ File version: Latest/Cached
+   ✅ All diagnostic info
+
+Jika result = ❌ NOT FOUND
+   → Browser masih cached, lanjut ke fix di atas
+
+
+✅ VERIFIKASI SUCCESS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Setelah fix, buka Dashboard Admin:
+
+1. Press F12 (DevTools)
+2. Check Console tab
+3. Harus ada log ini:
+
+   ✅ window.setImageFromUrl is now available
+      Type: function
+
+4. Click "Site Assets" menu
+5. Paste URL di input field:
+   https://i.ibb.co/84zR6qfT/hero-img.png
+
+6. Click "Set URL" button
+7. Console harus show:
+   🔗 Setting heroBanner from URL...
+   ⏳ Validating and saving URL...
+   ✅ Image loaded successfully
+   💾 Saving to database...
+   ✅ Database updated successfully
+
+8. Preview gambar update
+9. Toast notification muncul: "✅ berhasil diupdate!"
+
+
+🐛 JIKA MASIH ERROR:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Try different browser:
+   - Pakai Chrome? → Try Firefox
+   - Pakai Firefox? → Try Chrome
+   - Pakai Edge? → Try Chrome
+
+Or disable cache via DevTools:
+   1. Press F12
+   2. Go to Network tab
+   3. Checklist "Disable cache"
+   4. Keep F12 open
+   5. Refresh page
+
+
+📚 DOKUMENTASI LENGKAP:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Baca file ini untuk penjelasan detail:
+   → SOLUSI-SET-URL-ERROR.md
+
+
+═══════════════════════════════════════════════════════════════════
+
+Status: ✅ CODE SUDAH BENAR - TINGGAL CLEAR CACHE!
+Latest Commit: 75671c1
+Action: HARD REFRESH sekarang dengan Ctrl+Shift+R
+
+═══════════════════════════════════════════════════════════════════
