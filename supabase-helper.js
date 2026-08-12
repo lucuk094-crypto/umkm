@@ -1,4 +1,4 @@
-// Supabase Helper - Global alias to fix undefined issues
+// Supabase Helper - Initialize Supabase client
 (function() {
   let retryCount = 0;
   const maxRetries = 50; // 5 seconds total (50 * 100ms)
@@ -12,18 +12,20 @@
         try {
           // Create client if not exists
           if (!window.supabaseClient) {
-            window.supabaseClient = window.supabase.createClient(
+            const supabaseLib = window.supabase; // Save reference to library
+            
+            window.supabaseClient = supabaseLib.createClient(
               window.SUPABASE_CONFIG.url,
               window.SUPABASE_CONFIG.anonKey
             );
+            
+            // Use supabaseClient as the main client
+            window.supabase = window.supabaseClient;
+            
+            console.log('✅ Supabase initialized successfully');
+            console.log('📊 Project URL:', window.SUPABASE_CONFIG.url);
+            console.log('🔑 Anon Key:', window.SUPABASE_CONFIG.anonKey.substring(0, 20) + '...');
           }
-          
-          // Create global alias
-          window.supabase = window.supabaseClient;
-          
-          console.log('✅ Supabase initialized successfully');
-          console.log('📊 Project URL:', window.SUPABASE_CONFIG.url);
-          console.log('🔑 Anon Key:', window.SUPABASE_CONFIG.anonKey.substring(0, 20) + '...');
         } catch (error) {
           console.error('❌ Error creating Supabase client:', error);
         }
