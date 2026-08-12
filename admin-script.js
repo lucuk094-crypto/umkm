@@ -4,6 +4,46 @@
 function getSupabase() {
   return window.supabase || window.supabaseClient;
 }
+// ============================================
+// SET IMAGE FROM URL (EXPOSED IMMEDIATELY)
+// ============================================
+window.setImageFromUrl = async function(assetType) {
+  console.log('🔗 Setting ' + assetType + ' from URL...');
+  const inputId = assetType + 'UrlInput';
+  const previewId = assetType + 'Preview';
+  const urlDisplayId = assetType + 'Url';
+  const input = document.getElementById(inputId);
+  if (!input) { alert('Error: Input not found'); return; }
+  const imageUrl = input.value.trim();
+  if (!imageUrl) { alert('Masukkan URL gambar'); return; }
+  try { new URL(imageUrl); } catch (e) { alert('URL tidak valid'); return; }
+  try {
+    const testImg = new Image();
+    testImg.crossOrigin = 'anonymous';
+    await new Promise((resolve, reject) => {
+      testImg.onload = resolve;
+      testImg.onerror = () => reject(new Error('Image failed to load'));
+      testImg.src = imageUrl;
+    });
+    let settingsKey = assetType === 'heroBanner' ? 'hero_banner_url' : assetType === 'aboutImage' ? 'about_image_url' : 'site_logo_url';
+    await waitForSupabase();
+    const supabase = getSupabase();
+    if (!supabase) throw new Error('Supabase not initialized');
+    const { error } = await supabase.from('settings').upsert({ key: settingsKey, value: imageUrl }, { onConflict: 'key' });
+    if (error) throw error;
+    const preview = document.getElementById(previewId);
+    if (preview) preview.innerHTML = '<img src="' + imageUrl + '" style="width:100%;height:100%;object-fit:cover;">';
+    const urlDisplay = document.getElementById(urlDisplayId);
+    if (urlDisplay) urlDisplay.textContent = imageUrl;
+    input.value = '';
+    if (typeof showToast === 'function') showToast('✅ ' + assetType + ' berhasil diupdate!'); else alert('✅ Berhasil!');
+  } catch (error) {
+    console.error('Error:', error);
+    if (typeof showToast === 'function') showToast('Error: ' + error.message, 'error'); else alert('Error: ' + error.message);
+  }
+};
+console.log('✅ window.setImageFromUrl loaded');
+
 
 // Wait for supabase to be loaded
 window.addEventListener('DOMContentLoaded', () => {
