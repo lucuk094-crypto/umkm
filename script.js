@@ -1,49 +1,50 @@
 // UMKM Desa Mlancu — Platform UMKM Lokal
 
-// Wait for Supabase to initialize
+// Wait for Supabase to initialize (uses SUPABASE_READY flag from config.js)
 function waitForSupabase() {
   return new Promise((resolve) => {
-    console.log('⏳ waitForSupabase() called');
-    
-    // First, try to initialize if not done yet
-    if (window.initializeSupabase && (!window.supabase.from)) {
-      console.log('🔧 Calling window.initializeSupabase()...');
-      const initialized = window.initializeSupabase();
-      if (initialized) {
-        console.log('✅ Supabase initialized immediately');
-        resolve(true);
-        return;
-      }
-    }
+    console.log('⏳ waitForSupabase() called from script.js');
     
     let attempts = 0;
-    const maxAttempts = 50; // 5 seconds max
+    const maxAttempts = 100; // 10 seconds max
     
     const checkSupabase = () => {
       attempts++;
       
-      console.log(`🔍 Checking Supabase (attempt ${attempts}/${maxAttempts})...`);
-      console.log('  window.supabase exists:', !!window.supabase);
-      console.log('  window.supabase.from exists:', !!(window.supabase && window.supabase.from));
-      console.log('  typeof window.supabase.from:', typeof (window.supabase && window.supabase.from));
-      
-      // Check if supabase client has the methods we need
-      if (window.supabase && typeof window.supabase.from === 'function') {
-        console.log('✅ Supabase ready for website');
+      // Check the SUPABASE_READY flag set by config.js
+      if (window.SUPABASE_READY === true) {
+        console.log('✅ Supabase ready (SUPABASE_READY flag = true)');
+        console.log('✅ window.supabase.from:', typeof window.supabase.from);
         resolve(true);
-      } else if (attempts >= maxAttempts) {
-        console.error('⚠️ Supabase timeout after 5 seconds');
-        console.error('Final state:', {
+        return;
+      }
+      
+      // Also check directly
+      if (window.supabase && typeof window.supabase.from === 'function') {
+        console.log('✅ Supabase ready (direct check)');
+        window.SUPABASE_READY = true;
+        resolve(true);
+        return;
+      }
+      
+      // Timeout
+      if (attempts >= maxAttempts) {
+        console.error('⚠️ Supabase timeout after 10 seconds');
+        console.error('📊 Final state:', {
+          SUPABASE_READY: window.SUPABASE_READY,
+          SUPABASE_INIT_ATTEMPTS: window.SUPABASE_INIT_ATTEMPTS,
           supabaseExists: !!window.supabase,
           supabaseType: typeof window.supabase,
           hasFromMethod: !!(window.supabase && window.supabase.from),
-          supabaseKeys: window.supabase ? Object.keys(window.supabase).slice(0, 10) : []
         });
         resolve(false);
-      } else {
-        setTimeout(checkSupabase, 100);
+        return;
       }
+      
+      // Keep trying
+      setTimeout(checkSupabase, 100);
     };
+    
     checkSupabase();
   });
 }
