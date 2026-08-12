@@ -364,6 +364,20 @@ function renderProducts() {
   $$('#productGrid .reveal').forEach(el => io.observe(el));
   $$('[data-add]').forEach(b => b.addEventListener('click', () => addToCart(b.dataset.add)));
   $$('[data-wish]').forEach(b => b.addEventListener('click', () => toggleWish(b.dataset.wish)));
+  
+  // Show scroll hint on mobile if there are more than 3 products
+  const scrollHint = document.getElementById('scrollHint');
+  if (scrollHint && list.length > 3 && window.innerWidth <= 960) {
+    scrollHint.style.display = 'block';
+    
+    // Hide hint after first scroll
+    const productGrid = document.getElementById('productGrid');
+    productGrid.addEventListener('scroll', () => {
+      scrollHint.style.display = 'none';
+    }, { once: true });
+  } else if (scrollHint) {
+    scrollHint.style.display = 'none';
+  }
 }
 
 // Render Producers
