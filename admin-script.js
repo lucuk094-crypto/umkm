@@ -4,6 +4,27 @@
 function getSupabase() {
   return window.supabase || window.supabaseClient;
 }
+// Wait for Supabase to initialize
+function waitForSupabase() {
+  return new Promise((resolve) => {
+    let attempts = 0;
+    const maxAttempts = 100;
+    const checkSupabase = () => {
+      attempts++;
+      if (window.SUPABASE_READY === true || (window.supabase && typeof window.supabase.from === 'function')) {
+        window.SUPABASE_READY = true;
+        resolve(true);
+        return;
+      }
+      if (attempts >= maxAttempts) {
+        resolve(false);
+        return;
+      }
+      setTimeout(checkSupabase, 100);
+    };
+    checkSupabase();
+  });
+}
 // ============================================
 // SET IMAGE FROM URL (EXPOSED IMMEDIATELY)
 // ============================================
