@@ -16,6 +16,7 @@
     href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&family=Dancing+Script:wght@400;700&display=swap"
     rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="product-modal.css" />
   <link rel="preconnect" href="https://i.ibb.co" />
   <link rel="preload" as="image" href="https://i.ibb.co/84zR6qfT/hero-img.png" />
   
@@ -486,12 +487,85 @@
     </div>
     <div class="drawer-foot">
       <div class="subtotal"><span>Subtotal</span><span class="gold" id="subtotal">Rp 0</span></div>
-      <button class="btn btn-primary full">Checkout</button>
+      <button class="btn btn-primary full" id="checkoutBtn">Checkout via WhatsApp</button>
     </div>
   </aside>
 
   <!-- Toast -->
   <div class="toast" id="toast"></div>
+
+  <!-- Product Detail Modal -->
+  <div class="product-modal" id="productModal">
+    <button class="product-modal-close" id="closeProductModal">✕</button>
+    <div class="product-modal-inner">
+      <div class="product-modal-header">
+        <div class="product-gallery-main">
+          <div class="product-main-image" id="mainImage">
+            <!-- Main image/video will be injected here -->
+          </div>
+          <div class="product-thumbnails" id="productThumbnails">
+            <!-- Thumbnails will be injected here -->
+          </div>
+        </div>
+        
+        <div class="product-info">
+          <h2 id="modalProductName">Product Name</h2>
+          <div class="product-meta">
+            <div class="product-rating">
+              <span class="product-stars" id="modalProductStars">★★★★★</span>
+              <span class="muted small" id="modalProductRating">(0 ulasan)</span>
+            </div>
+            <span class="muted small" id="modalProductCategory">Category</span>
+          </div>
+          
+          <div class="product-price-section">
+            <div class="product-price-large" id="modalProductPrice">Rp 0</div>
+            <div class="product-stock" id="modalProductStock">Stok tersedia</div>
+          </div>
+          
+          <div class="product-description">
+            <h3>Deskripsi Produk</h3>
+            <p id="modalProductDescription">Product description</p>
+          </div>
+          
+          <div class="product-specs" id="modalProductSpecs">
+            <!-- Specs will be injected here -->
+          </div>
+          
+          <div class="product-quantity">
+            <label>Jumlah</label>
+            <div class="quantity-selector">
+              <button id="decreaseQty">−</button>
+              <span id="modalQuantity">1</span>
+              <button id="increaseQty">+</button>
+            </div>
+          </div>
+          
+          <div class="product-actions">
+            <button class="btn btn-primary" id="addToCartModal">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              Tambah ke Keranjang
+            </button>
+            <button class="btn btn-ghost" id="wishlistModal">♡</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="product-modal-body">
+        <div class="product-reviews-section">
+          <h3>Ulasan Pembeli</h3>
+          <div class="reviews-summary" id="reviewsSummary">
+            <!-- Reviews summary will be injected here -->
+          </div>
+          <div class="reviews-list" id="reviewsList">
+            <!-- Reviews will be injected here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
 </body>
 

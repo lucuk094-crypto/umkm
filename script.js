@@ -352,17 +352,18 @@ function renderProducts() {
         <p class="muted small" style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); font-size: 0.8rem;">
           <b style="color: var(--gold);">Pembuat:</b> ${p.producer}
         </p>
-        <button class="add-btn" data-add="${p.id}" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <button class="add-btn" data-view="${p.id}" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
           </svg>
-          Pesan via WhatsApp
+          Lihat Detail
         </button>
       </div>
     </article>
   `).join('');
   $$('#productGrid .reveal').forEach(el => io.observe(el));
-  $$('[data-add]').forEach(b => b.addEventListener('click', () => addToCart(b.dataset.add)));
+  $$('[data-view]').forEach(b => b.addEventListener('click', () => openProductModal(b.dataset.view)));
   $$('[data-wish]').forEach(b => b.addEventListener('click', () => toggleWish(b.dataset.wish)));
   
   // Show scroll hint on mobile if there are more than 3 products
@@ -629,4 +630,376 @@ Mohon konfirmasi untuk pesanan ini. Terima kasih!`;
   window.open(waUrl, '_blank');
   toast('Mengarahkan ke WhatsApp untuk konfirmasi pesanan');
   e.target.reset();
+});
+
+
+// ===== PRODUCT DETAIL MODAL =====
+let currentProduct = null;
+let currentProductGallery = [];
+let currentProductReviews = [];
+let modalQuantity = 1;
+
+const productModal = document.getElementById('productModal');
+const closeProductModalBtn = document.getElementById('closeProductModal');
+
+// Open product detail modal
+async function openProductModal(productId) {
+  const product = PRODUCTS.find(p => p.id === productId);
+  if (!product) return;
+  
+  currentProduct = product;
+  modalQuantity = 1;
+  
+  // Show modal
+  productModal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  
+  // Load product details
+  document.getElementById('modalProductName').textContent = product.name;
+  document.getElementById('modalProductPrice').textContent = `Rp ${product.price.toLocaleString('id-ID')}`;
+  document.getElementById('modalProductCategory').textContent = product.category;
+  document.getElementById('modalProductDescription').textContent = product.description || 'Tidak ada deskripsi';
+  document.getElementById('modalQuantity').textContent = modalQuantity;
+  
+  // Stock status
+  const stockEl = document.getElementById('modalProductStock');
+  if (product.stock > 10) {
+    stockEl.textContent = `Stok tersedia (${product.stock})`;
+    stockEl.classList.remove('low');
+  } else if (product.stock > 0) {
+    stockEl.textContent = `Stok terbatas (${product.stock} tersisa)`;
+    stockEl.classList.add('low');
+  } else {
+    stockEl.textContent = 'Stok habis';
+    stockEl.classList.add('low');
+  }
+  
+  // Load product gallery
+  await loadProductGallery(productId);
+  
+  // Load product reviews
+  await loadProductReviews(productId);
+  
+  // Load product specs if available
+  loadProductSpecs(product);
+}
+
+// Close modal
+function closeProductModal() {
+  productModal.classList.remove('open');
+  document.body.style.overflow = '';
+  currentProduct = null;
+  currentProductGallery = [];
+  currentProductReviews = [];
+  modalQuantity = 1;
+}
+
+// Load product gallery from database
+async function loadProductGallery(productId) {
+  try {
+    await waitForSupabase();
+    
+    const { data, error } = await window.supabase
+      .from('product_gallery')
+      .select('*')
+      .eq('product_id', productId)
+      .eq('is_active', true)
+      .order('order_index', { ascending: true });
+    
+    if (error) throw error;
+    
+    currentProductGallery = data || [];
+    
+    // If no gallery, use main product image
+    if (currentProductGallery.length === 0) {
+      currentProductGallery = [{
+        media_url: currentProduct.image,
+        media_type: 'image',
+        caption: currentProduct.name
+      }];
+    }
+    
+    renderProductGallery();
+    
+  } catch (error) {
+    console.error('Error loading product gallery:', error);
+    // Fallback to main image
+    currentProductGallery = [{
+      media_url: currentProduct.image,
+      media_type: 'image',
+      caption: currentProduct.name
+    }];
+    renderProductGallery();
+  }
+}
+
+// Render product gallery
+function renderProductGallery() {
+  const mainImage = document.getElementById('mainImage');
+  const thumbnails = document.getElementById('productThumbnails');
+  
+  if (currentProductGallery.length === 0) return;
+  
+  // Set first item as main
+  const firstItem = currentProductGallery[0];
+  if (firstItem.media_type === 'video') {
+    mainImage.innerHTML = `<video src="${firstItem.media_url}" controls autoplay loop></video>`;
+  } else {
+    mainImage.innerHTML = `<img src="${firstItem.media_url}" alt="${firstItem.caption || 'Product'}">`;
+  }
+  
+  // Render thumbnails
+  thumbnails.innerHTML = currentProductGallery.map((item, index) => `
+    <div class="product-thumb ${index === 0 ? 'active' : ''} ${item.media_type}" data-index="${index}">
+      ${item.media_type === 'video' ? 
+        `<video src="${item.media_url}"></video>` : 
+        `<img src="${item.media_url}" alt="${item.caption || 'Thumbnail'}">`
+      }
+    </div>
+  `).join('');
+  
+  // Add click handlers
+  document.querySelectorAll('.product-thumb').forEach(thumb => {
+    thumb.addEventListener('click', function() {
+      const index = parseInt(this.dataset.index);
+      const item = currentProductGallery[index];
+      
+      // Update main image
+      if (item.media_type === 'video') {
+        mainImage.innerHTML = `<video src="${item.media_url}" controls autoplay loop></video>`;
+      } else {
+        mainImage.innerHTML = `<img src="${item.media_url}" alt="${item.caption || 'Product'}">`;
+      }
+      
+      // Update active state
+      document.querySelectorAll('.product-thumb').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+}
+
+// Load product reviews
+async function loadProductReviews(productId) {
+  try {
+    await waitForSupabase();
+    
+    const { data, error } = await window.supabase
+      .from('product_reviews')
+      .select('*')
+      .eq('product_id', productId)
+      .eq('is_active', true)
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    
+    currentProductReviews = data || [];
+    renderProductReviews();
+    
+  } catch (error) {
+    console.error('Error loading product reviews:', error);
+    currentProductReviews = [];
+    renderProductReviews();
+  }
+}
+
+// Render product reviews
+function renderProductReviews() {
+  const reviewsSummary = document.getElementById('reviewsSummary');
+  const reviewsList = document.getElementById('reviewsList');
+  const modalProductRating = document.getElementById('modalProductRating');
+  const modalProductStars = document.getElementById('modalProductStars');
+  
+  if (currentProductReviews.length === 0) {
+    reviewsSummary.innerHTML = `<p class="muted center" style="width:100%">Belum ada ulasan untuk produk ini</p>`;
+    reviewsList.innerHTML = '';
+    modalProductRating.textContent = '(0 ulasan)';
+    modalProductStars.textContent = '☆☆☆☆☆';
+    return;
+  }
+  
+  // Calculate rating statistics
+  const totalReviews = currentProductReviews.length;
+  const avgRating = currentProductReviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews;
+  const ratingCounts = [0, 0, 0, 0, 0];
+  currentProductReviews.forEach(r => ratingCounts[r.rating - 1]++);
+  
+  // Update stars display
+  const fullStars = Math.floor(avgRating);
+  const halfStar = avgRating % 1 >= 0.5;
+  let starsHtml = '';
+  for (let i = 0; i < fullStars; i++) starsHtml += '★';
+  if (halfStar) starsHtml += '☆';
+  for (let i = fullStars + (halfStar ? 1 : 0); i < 5; i++) starsHtml += '☆';
+  modalProductStars.textContent = starsHtml;
+  modalProductRating.textContent = `(${totalReviews} ulasan)`;
+  
+  // Render summary
+  reviewsSummary.innerHTML = `
+    <div class="reviews-score">
+      <div class="reviews-score-number">${avgRating.toFixed(1)}</div>
+      <div class="reviews-score-stars">${starsHtml}</div>
+      <div class="reviews-score-count">${totalReviews} ulasan</div>
+    </div>
+    <div class="reviews-bars">
+      ${[5,4,3,2,1].map(star => {
+        const count = ratingCounts[star - 1];
+        const percentage = (count / totalReviews * 100).toFixed(0);
+        return `
+          <div class="review-bar">
+            <div class="review-bar-label">${star} bintang</div>
+            <div class="review-bar-track">
+              <div class="review-bar-fill" style="width: ${percentage}%"></div>
+            </div>
+            <div class="review-bar-count">${count}</div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+  
+  // Render reviews list
+  reviewsList.innerHTML = currentProductReviews.map(review => {
+    const reviewStars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+    const reviewDate = new Date(review.created_at).toLocaleDateString('id-ID', { 
+      year: 'numeric', month: 'long', day: 'numeric' 
+    });
+    const initials = review.customer_name.split(' ').map(n => n[0]).join('').substring(0, 2);
+    
+    return `
+      <div class="review-card">
+        <div class="review-header">
+          <div class="review-avatar">
+            ${review.customer_photo ? 
+              `<img src="${review.customer_photo}" alt="${review.customer_name}">` : 
+              initials
+            }
+          </div>
+          <div class="review-info">
+            <div class="review-name ${review.is_verified ? 'verified' : ''}">${review.customer_name}</div>
+            <div class="review-date">${reviewDate}</div>
+          </div>
+          <div class="review-stars">${reviewStars}</div>
+        </div>
+        <div class="review-text">${review.review_text}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Load product specs
+function loadProductSpecs(product) {
+  const specsEl = document.getElementById('modalProductSpecs');
+  
+  const specs = [];
+  if (product.producer) specs.push({ label: 'Pembuat', value: product.producer });
+  if (product.material) specs.push({ label: 'Bahan', value: product.material });
+  if (product.weight) specs.push({ label: 'Berat', value: `${product.weight}g` });
+  if (product.dimensions) specs.push({ label: 'Dimensi', value: product.dimensions });
+  if (product.process) specs.push({ label: 'Proses', value: product.process });
+  
+  if (specs.length === 0) {
+    specsEl.style.display = 'none';
+    return;
+  }
+  
+  specsEl.style.display = 'block';
+  specsEl.innerHTML = `
+    <h3>Spesifikasi</h3>
+    <div class="specs-list">
+      ${specs.map(spec => `
+        <div class="spec-item">
+          <span class="spec-label">${spec.label}</span>
+          <span class="spec-value">${spec.value}</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// Modal quantity controls
+document.getElementById('increaseQty').addEventListener('click', () => {
+  if (currentProduct && modalQuantity < currentProduct.stock) {
+    modalQuantity++;
+    document.getElementById('modalQuantity').textContent = modalQuantity;
+  }
+});
+
+document.getElementById('decreaseQty').addEventListener('click', () => {
+  if (modalQuantity > 1) {
+    modalQuantity--;
+    document.getElementById('modalQuantity').textContent = modalQuantity;
+  }
+});
+
+// Add to cart from modal (goes to cart, not direct WhatsApp)
+document.getElementById('addToCartModal').addEventListener('click', () => {
+  if (!currentProduct) return;
+  
+  // Find existing item in cart
+  const existingItem = cart.find(item => item.id === currentProduct.id);
+  
+  if (existingItem) {
+    existingItem.qty += modalQuantity;
+  } else {
+    cart.push({
+      id: currentProduct.id,
+      name: currentProduct.name,
+      price: currentProduct.price,
+      image: currentProduct.image,
+      qty: modalQuantity
+    });
+  }
+  
+  renderCart();
+  toast(`${modalQuantity}x ${currentProduct.name} ditambahkan ke keranjang`);
+  closeProductModal();
+});
+
+// Wishlist from modal
+document.getElementById('wishlistModal').addEventListener('click', () => {
+  if (!currentProduct) return;
+  toggleWish(currentProduct.id);
+  const btn = document.getElementById('wishlistModal');
+  btn.textContent = wishlist.has(currentProduct.id) ? '♥' : '♡';
+  toast(wishlist.has(currentProduct.id) ? 'Ditambahkan ke wishlist' : 'Dihapus dari wishlist');
+});
+
+// Close modal handlers
+closeProductModalBtn.addEventListener('click', closeProductModal);
+productModal.addEventListener('click', (e) => {
+  if (e.target === productModal) closeProductModal();
+});
+
+// Update product cards to open modal instead of direct WhatsApp
+// This will be handled in renderProducts() - change data-add to data-view
+
+
+// Checkout - send to WhatsApp with cart details
+document.getElementById('checkoutBtn').addEventListener('click', () => {
+  if (cart.length === 0) {
+    toast('Keranjang Anda kosong');
+    return;
+  }
+  
+  const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+  
+  let message = `*PESANAN BARU*\n\n`;
+  message += `Detail Pesanan:\n`;
+  message += `━━━━━━━━━━━━━━━\n`;
+  
+  cart.forEach((item, index) => {
+    message += `\n${index + 1}. *${item.name}*\n`;
+    message += `   Jumlah: ${item.qty}x\n`;
+    message += `   Harga: Rp ${item.price.toLocaleString('id-ID')}\n`;
+    message += `   Subtotal: Rp ${(item.price * item.qty).toLocaleString('id-ID')}\n`;
+  });
+  
+  message += `\n━━━━━━━━━━━━━━━\n`;
+  message += `*TOTAL: Rp ${total.toLocaleString('id-ID')}*\n\n`;
+  message += `Mohon konfirmasi ketersediaan dan detail pengiriman. Terima kasih!`;
+  
+  const waUrl = `https://wa.me/6285854321098?text=${encodeURIComponent(message)}`;
+  window.open(waUrl, '_blank');
+  
+  toast('Mengarahkan ke WhatsApp untuk konfirmasi pesanan');
 });
