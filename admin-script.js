@@ -11,12 +11,16 @@ window.addEventListener('DOMContentLoaded', () => {
   initializeDashboard();
 });
 
-async function initializeDashboard() {`n  const supabase = getSupabase();`n  const supabase = getSupabase();
+async function initializeDashboard() {
+  const supabase = getSupabase();
+  const supabase = getSupabase();
   await checkAuth();
 }
 
 // Check authentication
-async function checkAuth() {`n  const supabase = getSupabase();`n  const supabase = getSupabase();
+async function checkAuth() {
+  const supabase = getSupabase();
+  const supabase = getSupabase();
   const supabase = getSupabase();
   
   if (!supabase) {
@@ -85,7 +89,9 @@ function showToast(message, type = 'success') {
 }
 
 // Load Dashboard Data
-async function loadDashboard() {`n  const supabase = getSupabase();`n  const supabase = getSupabase();
+async function loadDashboard() {
+  const supabase = getSupabase();
+  const supabase = getSupabase();
   const supabase = getSupabase();
   try {
     // Get counts
@@ -132,7 +138,8 @@ function renderRecentProducts(products) {
 }
 
 // Load Page Data
-async function loadPageData(page) {`n  const supabase = getSupabase();
+async function loadPageData(page) {
+  const supabase = getSupabase();
   switch(page) {
     case 'dashboard':
       loadDashboard();
@@ -159,7 +166,9 @@ async function loadPageData(page) {`n  const supabase = getSupabase();
 }
 
 // ===== PRODUCTS MANAGEMENT =====
-async function loadProducts() {`n  const supabase = getSupabase();`n  const supabase = getSupabase();
+async function loadProducts() {
+  const supabase = getSupabase();
+  const supabase = getSupabase();
   try {
     const { data: products, error } = await supabase
       .from('products')
@@ -212,7 +221,8 @@ document.getElementById('addProductBtn')?.addEventListener('click', () => {
   showProductModal();
 });
 
-async function showProductModal(productId = null) {`n  const supabase = getSupabase();
+async function showProductModal(productId = null) {
+  const supabase = getSupabase();
   const isEdit = !!productId;
   let product = null;
 
@@ -299,7 +309,8 @@ async function showProductModal(productId = null) {`n  const supabase = getSupab
   });
 }
 
-async function saveProduct(productId, formData) {`n  const supabase = getSupabase();
+async function saveProduct(productId, formData) {
+  const supabase = getSupabase();
   const supabase = getSupabase();
   try {
     const data = {
@@ -339,7 +350,8 @@ async function saveProduct(productId, formData) {`n  const supabase = getSupabas
   }
 }
 
-async function deleteProduct(id) {`n  const supabase = getSupabase();
+async function deleteProduct(id) {
+  const supabase = getSupabase();
   if (!confirm('Yakin ingin menghapus produk ini?')) return;
 
   try {
@@ -357,7 +369,9 @@ window.editProduct = (id) => showProductModal(id);
 window.deleteProduct = deleteProduct;
 
 // ===== PRODUCERS MANAGEMENT =====
-async function loadProducers() {`n  const supabase = getSupabase();`n  const supabase = getSupabase();
+async function loadProducers() {
+  const supabase = getSupabase();
+  const supabase = getSupabase();
   try {
     const { data: producers, error } = await supabase
       .from('producers')
@@ -408,7 +422,8 @@ document.getElementById('addProducerBtn')?.addEventListener('click', () => {
   showProducerModal();
 });
 
-async function showProducerModal(producerId = null) {`n  const supabase = getSupabase();
+async function showProducerModal(producerId = null) {
+  const supabase = getSupabase();
   const isEdit = !!producerId;
   let producer = null;
 
@@ -556,7 +571,8 @@ async function showProducerModal(producerId = null) {`n  const supabase = getSup
   });
 }
 
-async function saveProducer(producerId, formData) {`n  const supabase = getSupabase();
+async function saveProducer(producerId, formData) {
+  const supabase = getSupabase();
   try {
     const name = formData.get('name');
     
@@ -610,7 +626,8 @@ async function saveProducer(producerId, formData) {`n  const supabase = getSupab
   }
 }
 
-async function deleteProducer(id) {`n  const supabase = getSupabase();
+async function deleteProducer(id) {
+  const supabase = getSupabase();
   if (!confirm('Yakin ingin menghapus pengrajin ini?')) return;
 
   try {
@@ -628,7 +645,9 @@ window.editProducer = (id) => showProducerModal(id);
 window.deleteProducer = deleteProducer;
 
 // ===== GALLERY MANAGEMENT =====
-async function loadGallery() {`n  const supabase = getSupabase();`n  const supabase = getSupabase();
+async function loadGallery() {
+  const supabase = getSupabase();
+  const supabase = getSupabase();
   try {
     const { data: gallery, error } = await supabase
       .from('gallery')
@@ -690,7 +709,8 @@ window.deleteGallery = async (id) => {
   }
 };
 
-async function showGalleryModal(galleryId = null) {`n  const supabase = getSupabase();
+async function showGalleryModal(galleryId = null) {
+  const supabase = getSupabase();
   const isEdit = !!galleryId;
   let gallery = null;
 
@@ -750,7 +770,8 @@ async function showGalleryModal(galleryId = null) {`n  const supabase = getSupab
   });
 }
 
-async function saveGallery(galleryId, formData) {`n  const supabase = getSupabase();
+async function saveGallery(galleryId, formData) {
+  const supabase = getSupabase();
   try {
     const data = {
       title: formData.get('title'),
@@ -780,7 +801,9 @@ async function saveGallery(galleryId, formData) {`n  const supabase = getSupabas
 }
 
 // ===== TESTIMONIALS MANAGEMENT =====
-async function loadTestimonials() {`n  const supabase = getSupabase();`n  const supabase = getSupabase();
+async function loadTestimonials() {
+  const supabase = getSupabase();
+  const supabase = getSupabase();
   try {
     const { data: testimonials, error } = await supabase
       .from('testimonials')
@@ -830,7 +853,8 @@ document.getElementById('addTestimonialBtn')?.addEventListener('click', () => {
   showTestimonialModal();
 });
 
-async function showTestimonialModal(testimonialId = null) {`n  const supabase = getSupabase();
+async function showTestimonialModal(testimonialId = null) {
+  const supabase = getSupabase();
   const isEdit = !!testimonialId;
   let testimonial = null;
 
@@ -886,7 +910,8 @@ async function showTestimonialModal(testimonialId = null) {`n  const supabase = 
   });
 }
 
-async function saveTestimonial(testimonialId, formData) {`n  const supabase = getSupabase();
+async function saveTestimonial(testimonialId, formData) {
+  const supabase = getSupabase();
   try {
     const data = {
       customer_name: formData.get('customer_name'),
@@ -914,7 +939,8 @@ async function saveTestimonial(testimonialId, formData) {`n  const supabase = ge
   }
 }
 
-async function deleteTestimonial(id) {`n  const supabase = getSupabase();
+async function deleteTestimonial(id) {
+  const supabase = getSupabase();
   if (!confirm('Yakin ingin menghapus testimoni ini?')) return;
 
   try {
@@ -932,7 +958,9 @@ window.editTestimonial = (id) => showTestimonialModal(id);
 window.deleteTestimonial = deleteTestimonial;
 
 // ===== ORDERS MANAGEMENT =====
-async function loadOrders() {`n  const supabase = getSupabase();`n  const supabase = getSupabase();
+async function loadOrders() {
+  const supabase = getSupabase();
+  const supabase = getSupabase();
   try {
     const { data: orders, error } = await supabase
       .from('orders')
@@ -970,7 +998,8 @@ async function loadOrders() {`n  const supabase = getSupabase();`n  const supaba
   }
 }
 
-window.updateOrderStatus = async (orderId, status) => {`n  const supabase = getSupabase();
+window.updateOrderStatus = async (orderId, status) => {
+  const supabase = getSupabase();
   try {
     const { error } = await supabase.from('orders').update({ status }).eq('id', orderId);
     if (error) throw error;
@@ -983,7 +1012,9 @@ window.updateOrderStatus = async (orderId, status) => {`n  const supabase = getS
 };
 
 // ===== SETTINGS MANAGEMENT =====
-async function loadSettings() {`n  const supabase = getSupabase();`n  const supabase = getSupabase();
+async function loadSettings() {
+  const supabase = getSupabase();
+  const supabase = getSupabase();
   try {
     const { data: settings, error } = await supabase.from('settings').select('*');
     if (error) throw error;
@@ -1006,7 +1037,8 @@ async function loadSettings() {`n  const supabase = getSupabase();`n  const supa
   }
 }
 
-async function saveSettings(formData) {`n  const supabase = getSupabase();
+async function saveSettings(formData) {
+  const supabase = getSupabase();
   try {
     const settings = [
       { key: 'whatsapp_number', value: formData.get('whatsapp_number') },
