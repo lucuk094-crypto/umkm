@@ -3,10 +3,18 @@
 // Wait for Supabase to initialize
 function waitForSupabase() {
   return new Promise((resolve) => {
+    let attempts = 0;
+    const maxAttempts = 50; // 5 seconds max
+    
     const checkSupabase = () => {
-      if (window.supabase && window.supabaseClient) {
+      attempts++;
+      
+      if (window.supabase || window.supabaseClient) {
         console.log('✅ Supabase ready for website');
         resolve();
+      } else if (attempts >= maxAttempts) {
+        console.warn('⚠️ Supabase timeout after 5 seconds');
+        resolve(); // Resolve anyway to prevent blocking
       } else {
         setTimeout(checkSupabase, 100);
       }
@@ -496,8 +504,11 @@ function renderCart() {
 document.addEventListener('DOMContentLoaded', async () => {
   console.log('🚀 Initializing UMKM Desa Mlancu website...');
   
+  // Wait for Supabase to be ready
+  await waitForSupabase();
+  
   // Check if Supabase is configured
-  if (typeof supabase === 'undefined' || !supabase) {
+  if (!window.supabase && !window.supabaseClient) {
     console.warn('⚠️ Supabase not configured. Using default data.');
     console.log('📝 Please configure config.js with your Supabase credentials.');
     loadDefaultProducts();
@@ -505,6 +516,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Fetch all data from database
+  console.log('📡 Fetching data from Supabase...');
   await Promise.all([
     fetchProducts(),
     fetchProducers(),
