@@ -1,5 +1,20 @@
 // UMKM Desa Mlancu — Platform UMKM Lokal
 
+// Wait for Supabase to initialize
+function waitForSupabase() {
+  return new Promise((resolve) => {
+    const checkSupabase = () => {
+      if (window.supabase && window.supabaseClient) {
+        console.log('✅ Supabase ready for website');
+        resolve();
+      } else {
+        setTimeout(checkSupabase, 100);
+      }
+    };
+    checkSupabase();
+  });
+}
+
 // Data akan diambil dari Supabase
 let PRODUCTS = [];
 let PRODUCERS = [];
@@ -14,7 +29,9 @@ const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
 async function fetchProducts() {
   try {
-    const { data, error } = await supabase
+    await waitForSupabase(); // Wait for supabase to be ready
+    
+    const { data, error } = await window.supabase
       .from('products')
       .select('*')
       .eq('is_active', true)
@@ -47,7 +64,9 @@ async function fetchProducts() {
 
 async function fetchProducers() {
   try {
-    const { data, error } = await supabase
+    await waitForSupabase(); // Wait for supabase to be ready
+    
+    const { data, error } = await window.supabase
       .from('producers')
       .select('*')
       .order('created_at', { ascending: false })
@@ -65,7 +84,9 @@ async function fetchProducers() {
 
 async function fetchGallery() {
   try {
-    const { data, error } = await supabase
+    await waitForSupabase(); // Wait for supabase to be ready
+    
+    const { data, error } = await window.supabase
       .from('gallery')
       .select('*')
       .eq('is_active', true)
@@ -84,7 +105,9 @@ async function fetchGallery() {
 
 async function fetchTestimonials() {
   try {
-    const { data, error } = await supabase
+    await waitForSupabase(); // Wait for supabase to be ready
+    
+    const { data, error } = await window.supabase
       .from('testimonials')
       .select('*')
       .eq('is_active', true)
@@ -102,7 +125,9 @@ async function fetchTestimonials() {
 
 async function fetchSettings() {
   try {
-    const { data, error } = await supabase
+    await waitForSupabase(); // Wait for supabase to be ready
+    
+    const { data, error } = await window.supabase
       .from('settings')
       .select('*');
 
