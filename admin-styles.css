@@ -1207,3 +1207,36 @@
     flex-shrink: 0;
   }
 }
+
+
+/* Sidebar Overlay for Mobile */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 99;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+@media (max-width: 1024px) {
+  .sidebar-overlay {
+    display: block;
+  }
+  
+  .admin-sidebar.open + * .sidebar-overlay,
+  body:has(.admin-sidebar.open) .sidebar-overlay {
+    opacity: 1;
+    pointer-events: all;
+  }
+  
+  /* Better mobile sidebar shadow */
+  .admin-sidebar.open {
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4);
+  }
+}
