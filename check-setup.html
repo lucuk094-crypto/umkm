@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Check Setup - UMKM Desa Mlancu</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+      font-family: system-ui, sans-serif; 
+      background: #0B0B0B; 
+      color: #F5E9DC; 
+      padding: 40px 20px; 
+      line-height: 1.6;
+    }
+    .container { max-width: 800px; margin: 0 auto; }
+    h1 { margin-bottom: 32px; color: #D4A373; }
+    h2 { margin: 32px 0 16px; color: #D4A373; font-size: 1.3rem; }
+    .check-item { 
+      background: rgba(245,233,220,.04); 
+      border: 1px solid rgba(245,233,220,.12); 
+      padding: 16px; 
+      margin-bottom: 12px; 
+      border-radius: 8px; 
+    }
+    .check-item.loading { border-color: #3b82f6; }
+    .check-item.success { border-color: #10b981; }
+    .check-item.error { border-color: #ef4444; }
+    .status { 
+      display: inline-block; 
+      padding: 4px 12px; 
+      border-radius: 4px; 
+      font-size: 0.85rem; 
+      font-weight: 600; 
+      margin-left: 8px;
+    }
+    .status.loading { background: #3b82f6; color: white; }
+    .status.success { background: #10b981; color: white; }
+    .status.error { background: #ef4444; color: white; }
+    .detail { 
+      margin-top: 8px; 
+      font-size: 0.9rem; 
+      color: #a59685; 
+      font-family: monospace;
+    }
+    button {
+      background: #D4A373;
+      color: #1a1208;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      margin-top: 24px;
+    }
+    button:hover { background: #B6865A; }
+    .code { 
+      background: rgba(0,0,0,0.5); 
+      padding: 16px; 
+      border-radius: 8px; 
+      font-family: monospace; 
+      font-size: 0.85rem;
+      margin: 12px 0;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔍 Check Setup UMKM Desa Mlancu</h1>
+    <p style="margin-bottom: 32px; color: #a59685;">Tool ini akan mengecek apakah semua setup sudah benar.</p>
+    
+    <h2>1. Supabase Connection</h2>
+    <div class="check-item" id="check-supabase">
+      <strong>Supabase Client</strong>
+      <span class="status loading">Checking...</span>
+      <div class="detail" id="detail-supabase"></div>
+    </div>
+    
+    <h2>2. Database Tables</h2>
+    <div class="check-item" id="check-products">
+      <strong>Table: products</strong>
+      <span class="status loading">Checking...</span>
+      <div class="detail" id="detail-products"></div>
+    </div>
+    
+    <div class="check-item" id="check-settings">
+      <strong>Table: settings</strong>
+      <span class="status loading">Checking...</span>
+      <div class="detail" id="detail-settings"></div>
+    </div>
+    
+    <div class="check-item" id="check-gallery">
+      <strong>Table: product_gallery</strong>
+      <span class="status loading">Checking...</span>
+      <div class="detail" id="detail-gallery"></div>
+    </div>
+    
+    <div class="check-item" id="check-reviews">
+      <strong>Table: product_reviews</strong>
+      <span class="status loading">Checking...</span>
+      <div class="detail" id="detail-reviews"></div>
+    </div>
+    
+    <h2>3. Storage Buckets</h2>
+    <div class="check-item" id="check-bucket-products">
+      <strong>Bucket: products</strong>
+      <span class="status loading">Checking...</span>
+      <div class="detail" id="detail-bucket-products"></div>
+    </div>
+    
+    <div class="check-item" id="check-bucket-site-assets">
+      <strong>Bucket: site-assets</strong>
+      <span class="status loading">Checking...</span>
+      <div class="detail" id="detail-bucket-site-assets"></div>
+    </div>
+    
+    <div class="check-item" id="check-bucket-product-gallery">
+      <strong>Bucket: product-gallery</strong>
+      <span class="status loading">Checking...</span>
+      <div class="detail" id="detail-bucket-product-gallery"></div>
+    </div>
+    
+    <button onclick="location.reload()">🔄 Check Ulang</button>
+    
+    <div style="margin-top: 48px; padding: 24px; background: rgba(212,163,115,0.1); border-radius: 12px; border: 1px solid rgba(212,163,115,0.3);">
+      <h3 style="margin-bottom: 12px; color: #D4A373;">💡 Jika Ada Yang Error:</h3>
+      <ul style="margin-left: 24px; color: #a59685;">
+        <li>Table tidak ada → Jalankan SQL di Supabase SQL Editor</li>
+        <li>Bucket tidak ada → Buat bucket di Supabase Storage (PUBLIC)</li>
+        <li>Permission denied → Pastikan RLS policies sudah dijalankan</li>
+      </ul>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script>
+    // Initialize Supabase
+    const supabase = window.supabase.createClient(
+      window.SUPABASE_CONFIG.url,
+      window.SUPABASE_CONFIG.anonKey
+    );
+
+    async function checkSupabase() {
+      try {
+        const { data, error } = await supabase.from('products').select('count');
+        setStatus('check-supabase', 'success', 'Connected to: ' + window.SUPABASE_CONFIG.url);
+      } catch (error) {
+        setStatus('check-supabase', 'error', error.message);
+      }
+    }
+
+    async function checkTable(tableName, checkId, detailId) {
+      try {
+        const { data, error } = await supabase.from(tableName).select('*').limit(1);
+        if (error) throw error;
+        setStatus(checkId, 'success', `Table exists. ${data.length} rows found (sample).`);
+      } catch (error) {
+        setStatus(checkId, 'error', error.message);
+      }
+    }
+
+    async function checkBucket(bucketName, checkId, detailId) {
+      try {
+        const { data, error } = await supabase.storage.from(bucketName).list('', { limit: 1 });
+        if (error) throw error;
+        setStatus(checkId, 'success', `Bucket exists. ${data.length} files found (sample).`);
+      } catch (error) {
+        setStatus(checkId, 'error', error.message);
+      }
+    }
+
+    function setStatus(checkId, status, message) {
+      const el = document.getElementById(checkId);
+      const statusEl = el.querySelector('.status');
+      const detailEl = el.querySelector('.detail');
+      
+      el.className = 'check-item ' + status;
+      statusEl.className = 'status ' + status;
+      
+      if (status === 'success') {
+        statusEl.textContent = '✅ OK';
+      } else if (status === 'error') {
+        statusEl.textContent = '❌ Error';
+      }
+      
+      detailEl.textContent = message;
+    }
+
+    // Run all checks
+    (async () => {
+      await checkSupabase();
+      await checkTable('products', 'check-products', 'detail-products');
+      await checkTable('settings', 'check-settings', 'detail-settings');
+      await checkTable('product_gallery', 'check-gallery', 'detail-gallery');
+      await checkTable('product_reviews', 'check-reviews', 'detail-reviews');
+      await checkBucket('products', 'check-bucket-products', 'detail-bucket-products');
+      await checkBucket('site-assets', 'check-bucket-site-assets', 'detail-bucket-site-assets');
+      await checkBucket('product-gallery', 'check-bucket-product-gallery', 'detail-bucket-product-gallery');
+    })();
+  </script>
+</body>
+</html>
