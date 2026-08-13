@@ -26,6 +26,31 @@
 .sidebar-header {
   padding: 32px 24px;
   border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.sidebar-close-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.3s var(--ease);
+  flex-shrink: 0;
+}
+
+.sidebar-close-btn:hover {
+  background: rgba(212, 163, 115, 0.1);
+  color: var(--gold);
+}
+
+.sidebar-close-btn:active {
+  transform: scale(0.95);
 }
 
 .sidebar-header .logo {
@@ -682,6 +707,11 @@
 
   .stats-grid {
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+  
+  /* Show close button on mobile */
+  .sidebar-close-btn {
+    display: block !important;
   }
 }
 
