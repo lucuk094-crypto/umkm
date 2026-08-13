@@ -1,0 +1,333 @@
+/* ============================================
+   BOTTOM NAVIGATION BAR
+   Modern app-like navigation di bottom
+   ============================================ */
+
+/* Hide top navbar links on mobile, show only logo */
+@media (max-width: 960px) {
+  .nav-links {
+    display: none !important;
+  }
+  
+  .navbar .nav-inner {
+    justify-content: space-between;
+  }
+  
+  /* Hide hamburger menu karena pakai bottom nav */
+  #menuBtn {
+    display: none !important;
+  }
+  
+  .mobile-menu {
+    display: none !important;
+  }
+}
+
+/* Bottom Navigation Bar */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: var(--glass-strong);
+  backdrop-filter: blur(28px) saturate(160%);
+  border-top: 1px solid var(--border);
+  padding: 8px 0;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.5);
+  display: none; /* Hidden by default, shown on mobile */
+}
+
+/* Show bottom nav on mobile/tablet */
+@media (max-width: 960px) {
+  .bottom-nav {
+    display: block;
+  }
+  
+  /* Add padding to body so content doesn't hide behind bottom nav */
+  body {
+    padding-bottom: 76px;
+  }
+}
+
+/* Bottom nav container */
+.bottom-nav-inner {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 12px;
+}
+
+/* Bottom nav item */
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--muted);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  min-width: 64px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Icon container */
+.bottom-nav-item .nav-icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bottom-nav-item svg {
+  width: 24px;
+  height: 24px;
+  stroke-width: 2;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Label */
+.bottom-nav-item .nav-label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Active state */
+.bottom-nav-item.active {
+  color: var(--gold);
+  background: rgba(212, 163, 115, 0.1);
+}
+
+.bottom-nav-item.active .nav-icon {
+  transform: translateY(-2px) scale(1.1);
+}
+
+.bottom-nav-item.active svg {
+  stroke-width: 2.5;
+  filter: drop-shadow(0 0 8px rgba(212, 163, 115, 0.5));
+}
+
+.bottom-nav-item.active .nav-label {
+  font-weight: 600;
+  color: var(--gold);
+}
+
+/* Hover state (desktop) */
+@media (min-width: 961px) {
+  .bottom-nav-item:hover {
+    color: var(--gold);
+    background: rgba(212, 163, 115, 0.08);
+  }
+  
+  .bottom-nav-item:hover .nav-icon {
+    transform: translateY(-2px) scale(1.05);
+  }
+}
+
+/* Touch feedback (mobile) */
+.bottom-nav-item:active {
+  transform: scale(0.95);
+  background: rgba(212, 163, 115, 0.15);
+}
+
+/* Active indicator dot */
+.bottom-nav-item.active::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 8px var(--gold);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.2);
+  }
+}
+
+/* Badge for cart (if needed later) */
+.bottom-nav-item .nav-badge {
+  position: absolute;
+  top: 2px;
+  right: 8px;
+  background: var(--grad-gold);
+  color: #1a1208;
+  font-size: 10px;
+  font-weight: 700;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(212, 163, 115, 0.5);
+  border: 2px solid var(--bg);
+}
+
+/* Desktop: Show as floating card (optional, elegant!) */
+@media (min-width: 961px) {
+  .bottom-nav {
+    display: none; /* Or keep it on desktop too! */
+  }
+  
+  /* Optional: Show bottom nav on desktop as floating card */
+  /*
+  .bottom-nav {
+    display: block;
+    bottom: 24px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: auto;
+    max-width: 600px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    padding: 12px 24px;
+  }
+  
+  .bottom-nav-inner {
+    gap: 8px;
+  }
+  */
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+}
+
+@media (max-width: 960px) {
+  html {
+    scroll-padding-bottom: 76px;
+  }
+}
+
+/* Hide cart button on mobile if in bottom nav */
+@media (max-width: 960px) {
+  /* Keep cart in navbar for now, or move to bottom nav */
+  #cartBtn {
+    /* Optional: hide if you add cart to bottom nav */
+  }
+}
+
+/* Ripple effect on tap (advanced) */
+.bottom-nav-item {
+  overflow: hidden;
+}
+
+.bottom-nav-item::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(212, 163, 115, 0.3) 0%, transparent 70%);
+  opacity: 0;
+  transform: scale(0);
+  transition: all 0.4s ease;
+}
+
+.bottom-nav-item:active::after {
+  opacity: 1;
+  transform: scale(2);
+  transition: none;
+}
+
+/* Safe area for iPhone notch */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .bottom-nav {
+    padding-bottom: calc(8px + env(safe-area-inset-bottom));
+  }
+}
+
+/* Glassmorphism effect enhancement */
+.bottom-nav::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(11, 11, 11, 0.95) 0%,
+    rgba(11, 11, 11, 0.85) 100%
+  );
+  z-index: -1;
+}
+
+/* Accessibility: Focus states */
+.bottom-nav-item:focus {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.bottom-nav-item:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Animation on page load */
+.bottom-nav {
+  animation: slideUpNav 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes slideUpNav {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Prevent layout shift */
+.bottom-nav-item {
+  content-visibility: auto;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .bottom-nav {
+    border-top: 2px solid var(--gold);
+  }
+  
+  .bottom-nav-item.active {
+    background: var(--gold);
+    color: var(--bg);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .bottom-nav,
+  .bottom-nav-item,
+  .bottom-nav-item::after,
+  .bottom-nav-item.active::before {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Dark mode enhancement (if you add dark mode later) */
+@media (prefers-color-scheme: dark) {
+  .bottom-nav {
+    background: rgba(20, 20, 20, 0.95);
+  }
+}
