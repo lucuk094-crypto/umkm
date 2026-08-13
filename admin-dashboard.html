@@ -64,6 +64,16 @@
           <span>Galeri</span>
         </a>
 
+        <a href="#" class="nav-item" data-page="product-gallery">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="2" width="20" height="20" rx="2" ry="2"></rect>
+            <path d="M8.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"></path>
+            <path d="M2 12l5-5 8 8"></path>
+            <path d="M19 17l-4-4"></path>
+          </svg>
+          <span>Galeri Produk</span>
+        </a>
+
         <a href="#" class="nav-item" data-page="testimonials">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"></path>
@@ -290,6 +300,58 @@
           
           <div class="gallery-grid" id="galleryGrid">
             <div class="text-center" style="grid-column: 1/-1;">Loading...</div>
+          </div>
+        </div>
+
+        <!-- Product Gallery Page -->
+        <div class="page-content" id="page-product-gallery">
+          <div class="page-header">
+            <h2>Manajemen Galeri Produk</h2>
+            <p class="muted small">Kelola foto/video detail untuk setiap produk. Galeri ini muncul di modal detail produk.</p>
+          </div>
+          
+          <!-- Product Selector -->
+          <div class="card" style="margin-bottom: 24px;">
+            <div class="card-body">
+              <label class="form-label">Pilih Produk:</label>
+              <select id="productGallerySelector" class="form-input">
+                <option value="">-- Pilih Produk --</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Gallery Items Container -->
+          <div id="productGalleryContainer" style="display: none;">
+            <div class="page-header">
+              <h3 id="selectedProductName" style="margin: 0;">Galeri: -</h3>
+              <button class="btn btn-primary" id="addProductGalleryBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Tambah Media
+              </button>
+            </div>
+
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th style="width: 100px;">Preview</th>
+                    <th>Tipe</th>
+                    <th>Caption</th>
+                    <th style="width: 80px;">Urutan</th>
+                    <th style="width: 80px;">Status</th>
+                    <th style="width: 120px;">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="productGalleryTable">
+                  <tr>
+                    <td colspan="6" class="text-center muted">Pilih produk untuk melihat galeri</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
