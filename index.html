@@ -482,7 +482,7 @@
   <aside class="cart-drawer" id="cartDrawer">
     <div class="drawer-head">
       <h3>Keranjang Anda</h3>
-      <button class="icon-btn" id="closeCart" aria-label="Tutup">✕</button>
+      <button class="icon-btn" onclick="document.getElementById('cartDrawer').classList.remove('open'); document.getElementById('drawerBackdrop').classList.remove('open');" aria-label="Tutup">✕</button>
     </div>
     <div class="drawer-body" id="cartItems">
       <p class="empty muted center">Keranjang Anda kosong.</p>

@@ -543,7 +543,7 @@ const badgeEl = $('#cartBadge');
 function openCart() { drawer.classList.add('open'); backdrop.classList.add('open'); }
 function closeCart() { drawer.classList.remove('open'); backdrop.classList.remove('open'); }
 $('#cartBtn').addEventListener('click', openCart);
-$('#closeCart').addEventListener('click', closeCart);
+// Close button uses inline onclick in HTML for reliability
 backdrop.addEventListener('click', closeCart);
 
 function addToCart(id) {
