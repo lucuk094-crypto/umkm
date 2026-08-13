@@ -478,11 +478,11 @@
   </footer>
 
   <!-- Cart Drawer -->
-  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <div class="drawer-backdrop" id="drawerBackdrop" onclick="closeCartDrawer()"></div>
   <aside class="cart-drawer" id="cartDrawer">
     <div class="drawer-head">
       <h3>Keranjang Anda</h3>
-      <button class="icon-btn" onclick="document.getElementById('cartDrawer').classList.remove('open'); document.getElementById('drawerBackdrop').classList.remove('open');" aria-label="Tutup">✕</button>
+      <button class="icon-btn" onclick="closeCartDrawer()" aria-label="Tutup">✕</button>
     </div>
     <div class="drawer-body" id="cartItems">
       <p class="empty muted center">Keranjang Anda kosong.</p>
@@ -492,6 +492,20 @@
       <button class="btn btn-primary full" id="checkoutBtn">Checkout via WhatsApp</button>
     </div>
   </aside>
+
+  <!-- Close Cart Function (Global) -->
+  <script>
+    // Global function to close cart drawer
+    function closeCartDrawer() {
+      const drawer = document.getElementById('cartDrawer');
+      const backdrop = document.getElementById('drawerBackdrop');
+      if (drawer) drawer.classList.remove('open');
+      if (backdrop) backdrop.classList.remove('open');
+    }
+    
+    // Expose to window for debugging
+    window.closeCartDrawer = closeCartDrawer;
+  </script>
 
   <!-- Toast -->
   <div class="toast" id="toast"></div>

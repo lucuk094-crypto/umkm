@@ -540,11 +540,19 @@ const itemsEl = $('#cartItems');
 const subtotalEl = $('#subtotal');
 const badgeEl = $('#cartBadge');
 
-function openCart() { drawer.classList.add('open'); backdrop.classList.add('open'); }
-function closeCart() { drawer.classList.remove('open'); backdrop.classList.remove('open'); }
+function openCart() { 
+  drawer.classList.add('open'); 
+  backdrop.classList.add('open'); 
+}
+
+// closeCartDrawer is defined globally in HTML for reliability
+// Use the global function
+const closeCart = window.closeCartDrawer || function() {
+  drawer.classList.remove('open');
+  backdrop.classList.remove('open');
+};
+
 $('#cartBtn').addEventListener('click', openCart);
-// Close button uses inline onclick in HTML for reliability
-backdrop.addEventListener('click', closeCart);
 
 function addToCart(id) {
   const p = PRODUCTS.find(x => x.id === id);
