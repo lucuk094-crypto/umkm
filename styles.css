@@ -210,9 +210,9 @@ button{font-family:inherit;cursor:pointer;background:none;border:none;color:inhe
 
 /* Cart drawer */
 .drawer-backdrop{position:fixed;inset:0;background:rgba(11,11,11,.7);backdrop-filter:blur(10px);z-index:90;opacity:0;pointer-events:none;transition:opacity .5s var(--ease)}
-.drawer-backdrop.open{opacity:1;pointer-events:auto}
-.cart-drawer{position:fixed;top:0;right:0;height:100vh;width:420px;max-width:100%;background:var(--glass-strong);backdrop-filter:blur(28px);border-left:1px solid var(--border);z-index:100;transform:translateX(100%);transition:transform .6s var(--ease);display:flex;flex-direction:column}
-.cart-drawer.open{transform:translateX(0)}
+.drawer-backdrop.open{opacity:1 !important;pointer-events:auto !important}
+.cart-drawer{position:fixed;top:0;right:0;height:100vh;width:420px;max-width:100%;background:var(--glass-strong);backdrop-filter:blur(28px);border-left:1px solid var(--border);z-index:100;transform:translateX(100%) !important;transition:transform .6s var(--ease);display:flex;flex-direction:column}
+.cart-drawer.open{transform:translateX(0) !important}
 .drawer-head{display:flex;justify-content:space-between;align-items:center;padding:24px;border-bottom:1px solid var(--border)}
 .drawer-head h3{font-size:1.5rem}
 .drawer-body{

@@ -15,10 +15,10 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&family=Dancing+Script:wght@400;700&display=swap"
     rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="product-modal.css" />
-  <link rel="stylesheet" href="smooth-scroll-enhancements.css" />
-  <link rel="stylesheet" href="bottom-nav.css" />
+  <link rel="stylesheet" href="styles.css?v=20260813-2" />
+  <link rel="stylesheet" href="product-modal.css?v=20260813" />
+  <link rel="stylesheet" href="smooth-scroll-enhancements.css?v=20260813" />
+  <link rel="stylesheet" href="bottom-nav.css?v=20260813" />
   <link rel="preconnect" href="https://i.ibb.co" />
   <link rel="preload" as="image" href="https://i.ibb.co/84zR6qfT/hero-img.png" />
   
@@ -29,13 +29,23 @@
       console.log('🛒 closeCartDrawer called');
       const drawer = document.getElementById('cartDrawer');
       const backdrop = document.getElementById('drawerBackdrop');
+      
+      console.log('Drawer element:', drawer);
+      console.log('Drawer classes before:', drawer ? drawer.className : 'null');
+      console.log('Backdrop element:', backdrop);
+      console.log('Backdrop classes before:', backdrop ? backdrop.className : 'null');
+      
       if (drawer) {
         drawer.classList.remove('open');
         console.log('✅ Cart drawer closed');
+        console.log('Drawer classes after:', drawer.className);
+        console.log('Drawer computed transform:', window.getComputedStyle(drawer).transform);
       }
       if (backdrop) {
         backdrop.classList.remove('open');
         console.log('✅ Backdrop closed');
+        console.log('Backdrop classes after:', backdrop.className);
+        console.log('Backdrop computed opacity:', window.getComputedStyle(backdrop).opacity);
       }
     };
     console.log('✅ closeCartDrawer function loaded in head');
