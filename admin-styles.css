@@ -1,5 +1,11 @@
 /* Admin Dashboard Styles - Matching Website Design */
 
+/* Smooth Scrolling Global */
+* {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
 /* Layout */
 .admin-layout {
   display: flex;
@@ -70,6 +76,9 @@
   flex: 1;
   padding: 24px 0;
   overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
 .nav-item {
@@ -158,6 +167,10 @@
   max-width: 1400px;
   width: 100%;
   margin: 0 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
 .page-content {
@@ -268,7 +281,10 @@
   backdrop-filter: blur(20px);
   border: 1px solid var(--border);
   border-radius: 16px;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
 .data-table {
@@ -549,11 +565,14 @@
   width: 90%;
   max-height: 90vh;
   overflow-y: auto;
+  overflow-x: hidden;
   z-index: 201;
   opacity: 0;
   pointer-events: none;
   transition: all 0.3s var(--ease);
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
 .modal.show {

@@ -1,0 +1,218 @@
+/* ============================================
+   SMOOTH SCROLL ENHANCEMENTS
+   Tambahkan smooth scrolling di seluruh website
+   ============================================ */
+
+/* Global smooth scroll */
+html {
+  scroll-behavior: smooth !important;
+  scroll-padding-top: 80px;
+}
+
+body {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* All scrollable containers */
+* {
+  scroll-behavior: smooth;
+}
+
+/* Smooth scroll untuk semua overflow containers */
+[style*="overflow: auto"],
+[style*="overflow-y: auto"],
+[style*="overflow-x: auto"],
+.overflow-auto,
+.overflow-y-auto,
+.overflow-x-auto {
+  scroll-behavior: smooth !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+/* Product grid horizontal scroll (mobile) */
+#productGrid {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Cart drawer body */
+.drawer-body,
+.cart-drawer {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Admin dashboard */
+.admin-content,
+.sidebar-nav,
+.modal,
+.modal-body,
+.table-container,
+.data-table tbody {
+  scroll-behavior: smooth !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+/* Gallery smooth scroll */
+.gallery-grid {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Mobile menu */
+.mobile-menu {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Tabs horizontal scroll */
+.tabs {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Modal tabs */
+.modal-tabs {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Custom scrollbar styling untuk semua scrollable areas */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(245, 233, 220, 0.04);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(212, 163, 115, 0.3);
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 163, 115, 0.5);
+}
+
+/* Thin scrollbar untuk mobile */
+@media (max-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(212, 163, 115, 0.3) rgba(245, 233, 220, 0.04);
+}
+
+/* Smooth transitions untuk semua interactive elements */
+a, button, .btn, .nav-item, .tab, .product, .feature, .gallery img {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Optimasi performa untuk animations */
+.reveal,
+.product,
+.feature,
+.t-card,
+.modal,
+.cart-drawer,
+.drawer-backdrop,
+.toast {
+  will-change: transform, opacity;
+}
+
+/* Reset will-change setelah animation selesai */
+.reveal.in,
+.product.in,
+.feature.in {
+  will-change: auto;
+}
+
+/* Smooth page transitions */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  * {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Respect user preference untuk reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html,
+  * {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Momentum scrolling untuk iOS */
+.admin-sidebar,
+.cart-drawer,
+.modal,
+.drawer-body,
+#productGrid,
+.table-container {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Smooth scroll snap untuk product grid */
+#productGrid.grid-3 {
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+#productGrid.grid-3 .product {
+  scroll-snap-align: start;
+  scroll-snap-stop: normal;
+}
+
+/* Smooth scroll untuk anchor links */
+a[href^="#"]:not([href="#"]) {
+  scroll-behavior: smooth;
+}
+
+/* Hardware acceleration untuk smooth performance */
+.product,
+.feature,
+.modal,
+.cart-drawer,
+.nav-item,
+.btn {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Prevent layout shift during scroll */
+img {
+  content-visibility: auto;
+}
+
+/* Lazy load optimization */
+img[loading="lazy"] {
+  content-visibility: auto;
+}
+
+/* Smooth opacity transitions */
+.fade-in,
+.reveal,
+.t-card {
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
